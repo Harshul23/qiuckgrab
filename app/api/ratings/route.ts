@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const validationResult = createRatingSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Validation failed", details: validationResult.error.errors },
+        { error: "Validation failed", details: validationResult.error.issues },
         { status: 400 }
       );
     }
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     });
 
     const avgRating =
-      allRatings.reduce((sum, r) => sum + r.stars, 0) / allRatings.length;
+      allRatings.reduce((sum: number, r: { stars: number }) => sum + r.stars, 0) / allRatings.length;
 
     // Get user for trust score calculation
     const user = await prisma.user.findUnique({
@@ -209,15 +209,15 @@ export async function GET(request: NextRequest) {
 
     const stats = {
       average: allRatings.length > 0
-        ? allRatings.reduce((sum, r) => sum + r.stars, 0) / allRatings.length
+        ? allRatings.reduce((sum: number, r: { stars: number }) => sum + r.stars, 0) / allRatings.length
         : 0,
       total: allRatings.length,
       distribution: {
-        5: allRatings.filter((r) => r.stars === 5).length,
-        4: allRatings.filter((r) => r.stars === 4).length,
-        3: allRatings.filter((r) => r.stars === 3).length,
-        2: allRatings.filter((r) => r.stars === 2).length,
-        1: allRatings.filter((r) => r.stars === 1).length,
+        5: allRatings.filter((r: { stars: number }) => r.stars === 5).length,
+        4: allRatings.filter((r: { stars: number }) => r.stars === 4).length,
+        3: allRatings.filter((r: { stars: number }) => r.stars === 3).length,
+        2: allRatings.filter((r: { stars: number }) => r.stars === 2).length,
+        1: allRatings.filter((r: { stars: number }) => r.stars === 1).length,
       },
     };
 

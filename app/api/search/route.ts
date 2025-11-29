@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const validationResult = searchSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Validation failed", details: validationResult.error.errors },
+        { error: "Validation failed", details: validationResult.error.issues },
         { status: 400 }
       );
     }
@@ -50,8 +50,10 @@ export async function POST(request: NextRequest) {
       if (minPrice !== undefined) {
         (where.price as Record<string, number>).gte = minPrice;
       }
-      if (maxPrice !== undefined || parsedQuery.priceRange?.max) {
-        (where.price as Record<string, number>).lte = maxPrice || parsedQuery.priceRange?.max;
+      if (maxPrice !== undefined) {
+        (where.price as Record<string, number>).lte = maxPrice;
+      } else if (parsedQuery.priceRange?.max !== undefined) {
+        (where.price as Record<string, number>).lte = parsedQuery.priceRange.max;
       }
     }
 
@@ -61,7 +63,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Determine sort order
-    let orderBy: Record<string, string> = { createdAt: "desc" };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let orderBy: any = { createdAt: "desc" };
     switch (sort) {
       case "price_asc":
         orderBy = { price: "asc" };
@@ -73,7 +76,7 @@ export async function POST(request: NextRequest) {
         orderBy = { createdAt: "desc" };
         break;
       case "rating":
-        orderBy = { seller: { avgRating: "desc" } } as Record<string, string>;
+        orderBy = { seller: { avgRating: "desc" } };
         break;
     }
 
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     // Enhance items with AI price ratings
     const enhancedItems = await Promise.all(
-      items.map(async (item) => {
+      items.map(async (item: { name: string; price: number; condition: string }) => {
         const priceCheck = await checkItemPrice(item.name, item.price, item.condition);
         return {
           ...item,

@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const validationResult = createDisputeSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Validation failed", details: validationResult.error.errors },
+        { error: "Validation failed", details: validationResult.error.issues },
         { status: 400 }
       );
     }
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     // Run AI arbitration
     const messageHistory = transaction.messages.map(
-      (m) => `[${m.createdAt.toISOString()}] ${m.senderId}: ${m.content}`
+      (m: { createdAt: Date; senderId: string; content: string }) => `[${m.createdAt.toISOString()}] ${m.senderId}: ${m.content}`
     );
 
     const aiResolution = await resolveDispute(transactionId, {

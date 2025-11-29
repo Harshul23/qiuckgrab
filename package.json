@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@prisma/client": "^7.0.1",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -34,6 +33,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@prisma/client": "^6.19.0",
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
@@ -44,7 +44,7 @@
     "baseline-browser-mapping": "^2.8.32",
     "eslint": "^9",
     "eslint-config-next": "16.0.5",
-    "prisma": "^7.0.1",
+    "prisma": "^6.19.0",
     "tailwindcss": "^4.1.17",
     "typescript": "^5"
   }
