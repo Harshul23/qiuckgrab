@@ -35,6 +35,13 @@ interface Transaction {
     name: string;
     photo: string | null;
   };
+  messages?: Message[];
+}
+
+interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
 }
 
 export default function ChatPage({ params }: { params: Promise<{ transactionId: string }> }) {
@@ -44,69 +51,79 @@ export default function ChatPage({ params }: { params: Promise<{ transactionId: 
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const currentUserId = "mock-user-id"; // In real app, get from auth context
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  // Load current user from localStorage
   useEffect(() => {
-    // Mock data for demo
-    setTransaction({
-      id: transactionId,
-      status: "ACCEPTED",
-      escrowAmount: 25.00,
-      meetupLocation: null,
-      countdownEnd: null,
-      item: {
-        id: "item-1",
-        name: "iPhone Charger",
-        price: 25.00,
-        photo: null,
-      },
-      buyer: {
-        id: "buyer-1",
-        name: "John Doe",
-        photo: null,
-      },
-      seller: {
-        id: "seller-1",
-        name: "Jane Smith",
-        photo: null,
-      },
-    });
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user && typeof user.id === "string") {
+          setCurrentUser(user);
+        }
+      } catch (err) {
+        // Invalid JSON in localStorage, clear corrupted data
+        console.error("Failed to parse user data from localStorage:", err);
+        localStorage.removeItem("user");
+      }
+    }
+  }, []);
 
-    setMessages([
-      {
-        id: "1",
-        senderId: "buyer-1",
-        content: "Hi! I'm interested in the iPhone charger. Is it still available?",
-        createdAt: new Date(Date.now() - 3600000).toISOString(),
-      },
-      {
-        id: "2",
-        senderId: "seller-1",
-        content: "Yes, it's available! It's brand new, never used.",
-        createdAt: new Date(Date.now() - 3500000).toISOString(),
-      },
-      {
-        id: "3",
-        senderId: "ai",
-        content: "🗺️ AI Suggestion: Based on both your locations, the Student Union Building lobby would be a great meetup spot. It's well-lit and has security cameras.",
-        createdAt: new Date(Date.now() - 3400000).toISOString(),
-        isAI: true,
-      },
-    ]);
+  // Fetch transaction data
+  const fetchTransaction = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Please sign in to view this transaction");
+        setLoading(false);
+        return;
+      }
 
-    setLoading(false);
+      const res = await fetch(`/api/transactions/${transactionId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to load transaction");
+        setLoading(false);
+        return;
+      }
+
+      setTransaction(data.transaction);
+      // Load messages from transaction
+      if (data.transaction.messages) {
+        setMessages(data.transaction.messages.map((msg: Message) => ({
+          ...msg,
+          isAI: msg.isAI || false,
+        })));
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to fetch transaction:", err);
+      setError("Something went wrong");
+      setLoading(false);
+    }
+  }, [transactionId]);
+
+  useEffect(() => {
+    fetchTransaction();
 
     // In real app, connect to Socket.io here
     // socketClient.connect();
     // socketClient.joinTransaction(transactionId);
     // socketClient.onMessage((data) => setMessages(prev => [...prev, data.message]));
-  }, [transactionId]);
+  }, [fetchTransaction]);
 
   useEffect(() => {
     scrollToBottom();
@@ -114,7 +131,7 @@ export default function ChatPage({ params }: { params: Promise<{ transactionId: 
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !currentUser) return;
 
     setSending(true);
     const messageContent = newMessage;
@@ -123,7 +140,7 @@ export default function ChatPage({ params }: { params: Promise<{ transactionId: 
     // Add message optimistically
     const tempMessage: Message = {
       id: Date.now().toString(),
-      senderId: currentUserId,
+      senderId: currentUser.id,
       content: messageContent,
       createdAt: new Date().toISOString(),
     };
@@ -160,14 +177,18 @@ export default function ChatPage({ params }: { params: Promise<{ transactionId: 
     );
   }
 
-  if (!transaction) {
+  if (error || !transaction) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Transaction not found</p>
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <p className="text-gray-600 mb-4">{error || "Transaction not found"}</p>
+        <Link href="/home">
+          <Button>Back to Home</Button>
+        </Link>
       </div>
     );
   }
 
+  const currentUserId = currentUser?.id || "";
   const otherUser = currentUserId === transaction.buyer.id ? transaction.seller : transaction.buyer;
 
   return (
@@ -228,7 +249,7 @@ export default function ChatPage({ params }: { params: Promise<{ transactionId: 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => {
-          const isOwnMessage = message.senderId === currentUserId || message.senderId === "buyer-1";
+          const isOwnMessage = message.senderId === currentUserId;
           const isAI = message.isAI;
 
           return (
