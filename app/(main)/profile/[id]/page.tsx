@@ -92,9 +92,6 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setRatings(data.user.ratingsReceived || []);
       setItems(data.user.items || []);
     } catch (err) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("Error fetching profile data:", err);
-      }
       setError("Failed to connect to server");
     } finally {
       setLoading(false);

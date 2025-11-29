@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle, Badge, Avatar, AvatarFallback, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui";
-import { Search, Zap, Filter, Star, Clock, Mic, User, LogOut } from "lucide-react";
+import { Button, Input, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel, Avatar, AvatarFallback } from "@/components/ui";
+import { ItemCardSkeleton } from "@/components/ui/item-card-skeleton";
+import { ItemCard, type Item } from "@/components/item-card";
+import { Search, Zap, Filter, Mic, User, LogOut } from "lucide-react";
 
 interface AuthUser {
   id: string;
@@ -13,34 +15,20 @@ interface AuthUser {
   photo: string | null;
 }
 
-interface Item {
-  id: string;
-  name: string;
-  price: number;
-  photo: string | null;
-  condition: string;
-  aiPriceRating: string;
-  category: string;
-  createdAt: string;
-  seller: {
-    id: string;
-    name: string;
-    photo: string | null;
-    verificationStatus: string;
-    trustScore: number;
-    avgRating: number;
-    badges: string[];
-    isOnline: boolean;
-  };
-}
 
 export default function HomePage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const observerTarget = useRef<HTMLDivElement>(null);
+  const isSearchMode = useRef(false);
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -61,9 +49,83 @@ export default function HomePage() {
     }
   }, []);
 
-  // Fetch items on mount
+  // Load cached items from sessionStorage on mount
   useEffect(() => {
-    fetchItems();
+    try {
+      const cached = sessionStorage.getItem("homeItems");
+      const cachedPage = sessionStorage.getItem("homePage");
+      if (cached && cachedPage) {
+        const parsedItems = JSON.parse(cached);
+        const parsedPage = parseInt(cachedPage, 10);
+        if (parsedItems.length > 0) {
+          setItems(parsedItems);
+          setPage(parsedPage);
+          setHasMore(parsedItems.length >= 10 * parsedPage);
+        }
+      }
+    } catch {
+      // Ignore cache errors
+    }
+  }, []);
+
+  // Fetch items with pagination
+  const fetchItems = useCallback(async (pageNum: number = 1, append: boolean = false) => {
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setError(null);
+    }
+
+    try {
+      const res = await fetch(`/api/items?page=${pageNum}&limit=10`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch items");
+      }
+      const data = await res.json();
+      const newItems = data.items || [];
+      
+      if (append) {
+        setItems((prev) => [...prev, ...newItems]);
+      } else {
+        setItems(newItems);
+        // Cache items in sessionStorage
+        try {
+          sessionStorage.setItem("homeItems", JSON.stringify(newItems));
+          sessionStorage.setItem("homePage", pageNum.toString());
+        } catch {
+          // Ignore storage errors
+        }
+      }
+
+      setHasMore(newItems.length === 10 && pageNum < (data.pagination?.totalPages || 1));
+      setPage(pageNum);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load items");
+      // If we have cached items and this is initial load, show them
+      if (!append) {
+        try {
+          const cached = sessionStorage.getItem("homeItems");
+          if (cached) {
+            const parsedItems = JSON.parse(cached);
+            setItems(parsedItems);
+          }
+        } catch {
+          // Ignore cache errors
+        }
+      }
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, []);
+
+  // Initial fetch on mount (only if no cached items)
+  useEffect(() => {
+    if (items.length === 0) {
+      fetchItems(1, false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogout = () => {
@@ -75,41 +137,70 @@ export default function HomePage() {
     router.push("/signin");
   };
 
-  const fetchItems = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/items");
-      const data = await res.json();
-      setItems(data.items || []);
-    } catch (error) {
-      console.error("Failed to fetch items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) {
-      fetchItems();
+      isSearchMode.current = false;
+      setPage(1);
+      setHasMore(true);
+      fetchItems(1, false);
       return;
     }
 
+    isSearchMode.current = true;
     setLoading(true);
+    setError(null);
+    setPage(1);
+    setHasMore(false);
+    
     try {
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchQuery }),
+        body: JSON.stringify({ query: searchQuery, page: 1, limit: 10 }),
       });
+      if (!res.ok) {
+        throw new Error("Search failed");
+      }
       const data = await res.json();
       setItems(data.items || []);
-    } catch (error) {
-      console.error("Search failed:", error);
+      setHasMore((data.items?.length || 0) === 10 && (data.pagination?.totalPages || 1) > 1);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Search failed");
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, fetchItems]);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!observerTarget.current || !hasMore || loadingMore || loading || isSearchMode.current) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasMore && !loadingMore) {
+          fetchItems(page + 1, true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(observerTarget.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasMore, loadingMore, loading, page, fetchItems]);
+
+  const handleRetry = useCallback(() => {
+    if (isSearchMode.current) {
+      handleSearch(new Event("submit") as unknown as React.FormEvent);
+    } else {
+      fetchItems(page, false);
+    }
+  }, [handleSearch, fetchItems, page]);
 
   const startVoiceSearch = () => {
     // Check for browser support
@@ -151,7 +242,7 @@ export default function HomePage() {
     recognition.start();
   };
 
-  const getPriceRatingColor = (rating: string) => {
+  const getPriceRatingColor = useCallback((rating: string) => {
     switch (rating) {
       case "Great Deal":
         return "success";
@@ -162,7 +253,7 @@ export default function HomePage() {
       default:
         return "secondary";
     }
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -251,11 +342,18 @@ export default function HomePage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        {loading && items.length === 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ItemCardSkeleton key={i} />
+            ))}
           </div>
-        ) : items.length === 0 ? (
+        ) : error && items.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-red-500 mb-4">{error}</p>
+            <Button onClick={handleRetry}>Retry</Button>
+          </div>
+        ) : items.length === 0 && !loading ? (
           <div className="text-center py-20">
             <p className="text-gray-500 mb-4">No items found</p>
             <Link href="/list-item">
@@ -263,103 +361,29 @@ export default function HomePage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {items.map((item) => (
-              <Link key={item.id} href={`/item/${item.id}`}>
-                <Card className="hover:shadow-lg transition-shadow h-full">
-                  {/* Item Image */}
-                  <div className="aspect-square bg-gray-100 relative overflow-hidden rounded-t-lg">
-                    {item.photo ? (
-                      <img
-                        src={item.photo}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        No Image
-                      </div>
-                    )}
-                    {/* Price Rating Badge */}
-                    {item.aiPriceRating && (
-                      <Badge
-                        variant={getPriceRatingColor(item.aiPriceRating) as "success" | "secondary" | "destructive"}
-                        className="absolute top-2 right-2"
-                      >
-                        {item.aiPriceRating}
-                      </Badge>
-                    )}
-                  </div>
-
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg line-clamp-2">{item.name}</CardTitle>
-                      <span className="text-xl font-bold text-blue-600">
-                        ₹{item.price.toFixed(2)}
-                      </span>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent>
-                    {/* Condition & Category */}
-                    <div className="flex gap-2 mb-3">
-                      <Badge variant="outline">{item.condition}</Badge>
-                      <Badge variant="outline">{item.category}</Badge>
-                    </div>
-
-                    {/* Seller Info */}
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback className="text-xs">
-                            {item.seller.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="flex items-center">
-                            <span className="font-medium">{item.seller.name}</span>
-                            {item.seller.verificationStatus === "VERIFIED" && (
-                              <span className="ml-1 text-blue-600">✓</span>
-                            )}
-                          </div>
-                          <div className="flex items-center text-gray-500 text-xs">
-                            <Star className="h-3 w-3 mr-1 fill-yellow-400 text-yellow-400" />
-                            {item.seller.avgRating.toFixed(1)}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Online Status */}
-                      <div className="flex items-center">
-                        {item.seller.isOnline ? (
-                          <span className="flex items-center text-green-600 text-xs">
-                            <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
-                            Online
-                          </span>
-                        ) : (
-                          <span className="flex items-center text-gray-400 text-xs">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Offline
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Location */}
-                    {item.seller.badges.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {item.seller.badges.slice(0, 2).map((badge, i) => (
-                          <span key={i} className="text-xs bg-gray-100 px-2 py-0.5 rounded">
-                            {badge}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {items.map((item) => (
+                <ItemCard key={item.id} item={item} getPriceRatingColor={getPriceRatingColor} />
+              ))}
+            </div>
+            {/* Infinite scroll trigger */}
+            {hasMore && !isSearchMode.current && (
+              <div ref={observerTarget} className="h-10 flex items-center justify-center py-8">
+                {loadingMore && (
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                )}
+              </div>
+            )}
+            {error && items.length > 0 && (
+              <div className="text-center py-4">
+                <p className="text-red-500 text-sm mb-2">{error}</p>
+                <Button variant="outline" size="sm" onClick={handleRetry}>
+                  Retry
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

@@ -125,7 +125,6 @@ export async function POST(request: NextRequest) {
       ratingRequired: true,
     });
   } catch (error) {
-    console.error("Confirm transaction error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

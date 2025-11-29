@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Textarea, FileUpload } from "@/components/ui";
-import { ArrowLeft, Zap, IndianRupee, Tag } from "lucide-react";
+import { ArrowLeft, Zap, IndianRupee, Tag, CheckCircle } from "lucide-react";
 
 const CATEGORIES = [
   "Electronics",
@@ -26,7 +27,9 @@ const CONDITIONS = [
 ];
 
 export default function ListItemPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -57,16 +60,21 @@ export default function ListItemPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+    setSuccess(false);
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/signin";
+      return;
+    }
+
+    // Show success state immediately (optimistic UI)
+    setSuccess(true);
+    setLoading(true);
+
+    // Send request in background
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "/signin";
-        return;
-      }
-
       const res = await fetch("/api/items", {
         method: "POST",
         headers: {
@@ -89,12 +97,20 @@ export default function ListItemPage() {
         throw new Error(data.error || "Failed to list item");
       }
 
-      // Redirect to item page
-      alert("Item listed successfully!");
-      window.location.href = `/item/${data.item.id}`;
+      // Clear cache to show new item in home page
+      try {
+        sessionStorage.removeItem("homeItems");
+        sessionStorage.removeItem("homePage");
+      } catch {
+        // Ignore storage errors
+      }
+
+      // Redirect to item page after successful creation
+      router.push(`/item/${data.item.id}`);
     } catch (err) {
+      // Rollback optimistic state on error
       setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
+      setSuccess(false);
       setLoading(false);
     }
   };
@@ -122,6 +138,12 @@ export default function ListItemPage() {
             <CardTitle className="text-2xl">List an Item for Sale</CardTitle>
           </CardHeader>
           <CardContent>
+            {success && !error && (
+              <div className="bg-green-50 text-green-600 p-3 rounded-md mb-6 text-sm flex items-center">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Item listed successfully! Redirecting...
+              </div>
+            )}
             {error && (
               <div className="bg-red-50 text-red-600 p-3 rounded-md mb-6 text-sm">
                 {error}

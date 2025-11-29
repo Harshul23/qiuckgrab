@@ -70,7 +70,6 @@ export default function ChatPage({ params }: { params: Promise<{ transactionId: 
         }
       } catch (err) {
         // Invalid JSON in localStorage, clear corrupted data
-        console.error("Failed to parse user data from localStorage:", err);
         localStorage.removeItem("user");
       }
     }
@@ -110,7 +109,6 @@ export default function ChatPage({ params }: { params: Promise<{ transactionId: 
       }
       setLoading(false);
     } catch (err) {
-      console.error("Failed to fetch transaction:", err);
       setError("Something went wrong");
       setLoading(false);
     }

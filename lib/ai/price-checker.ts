@@ -75,7 +75,6 @@ Analyze and return pricing assessment JSON.`,
       return fallbackPriceCheck(itemName, price, condition);
     }
   } catch (error) {
-    console.error("Price check error:", error);
     return fallbackPriceCheck(itemName, price, condition);
   }
 }
@@ -143,5 +142,4 @@ export function updateAveragePrices(
 ): void {
   // In production, this would update the database
   // For MVP, prices are static
-  console.log("Price update logged for analytics");
 }
