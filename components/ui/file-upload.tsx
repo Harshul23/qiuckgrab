@@ -47,7 +47,10 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         if (accept) {
           const acceptedTypes = accept.split(",").map((t) => t.trim());
           const fileType = file.type;
-          const fileExtension = `.${file.name.split(".").pop()?.toLowerCase()}`;
+          const fileNameParts = file.name.split(".");
+          const fileExtension = fileNameParts.length > 1 
+            ? `.${fileNameParts.pop()?.toLowerCase() ?? ""}` 
+            : "";
 
           const isValid = acceptedTypes.some((type) => {
             if (type.startsWith(".")) {
