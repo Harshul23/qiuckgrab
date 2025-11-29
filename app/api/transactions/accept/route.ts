@@ -86,6 +86,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Mark item as RESERVED now that seller has accepted
+    // This hides the item from public listings
+    await prisma.item.update({
+      where: { id: transaction.itemId },
+      data: { availabilityStatus: "RESERVED" },
+    });
+
     // TODO: Send Socket.io notification to buyer
     // Open chat room
 

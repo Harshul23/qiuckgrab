@@ -112,11 +112,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Update item status to reserved
-    await prisma.item.update({
-      where: { id: itemId },
-      data: { availabilityStatus: "RESERVED" },
-    });
+    // Item remains AVAILABLE until seller accepts the transaction
+    // Status will be updated to RESERVED when seller accepts
 
     // TODO: Send Socket.io notification to seller
     // socketClient.emit('request', { transactionId: transaction.id, ... })
