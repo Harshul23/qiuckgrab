@@ -49,68 +49,24 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   const [loading, setLoading] = useState(true);
 
   const fetchProfileData = useCallback(async () => {
-    // Mock data for demo - in production, fetch from API
-    const mockUser: UserProfile = {
-      id: id,
-      name: "Jane Smith",
-      photo: null,
-      college: "State University",
-      verificationStatus: "VERIFIED",
-      trustScore: 85,
-      badges: ["🏆 Trusted Seller", "⚡ Quick Responder", "💎 Fair Pricer"],
-      avgRating: 4.8,
-      completedDeals: 47,
-      cancellationRate: 0.02,
-      createdAt: "2024-01-15",
-    };
+    try {
+      const res = await fetch(`/api/users/${id}`);
+      
+      if (!res.ok) {
+        console.error("Failed to fetch user profile");
+        setLoading(false);
+        return;
+      }
 
-    const mockRatings: Rating[] = [
-      {
-        id: "1",
-        stars: 5,
-        comment: "Great seller! Fast response and item was exactly as described.",
-        createdAt: "2024-11-20",
-        fromUser: { id: "u1", name: "John Doe", photo: null },
-      },
-      {
-        id: "2",
-        stars: 5,
-        comment: "Super smooth transaction. Would buy again!",
-        createdAt: "2024-11-18",
-        fromUser: { id: "u2", name: "Alex Johnson", photo: null },
-      },
-      {
-        id: "3",
-        stars: 4,
-        comment: "Good experience overall. Item was in good condition.",
-        createdAt: "2024-11-15",
-        fromUser: { id: "u3", name: "Sam Wilson", photo: null },
-      },
-    ];
-
-    const mockItems: Item[] = [
-      {
-        id: "i1",
-        name: "iPhone 13 Charger",
-        price: 25,
-        photo: null,
-        condition: "NEW",
-        availabilityStatus: "AVAILABLE",
-      },
-      {
-        id: "i2",
-        name: "Calculus Textbook",
-        price: 40,
-        photo: null,
-        condition: "GOOD",
-        availabilityStatus: "AVAILABLE",
-      },
-    ];
-
-    setUser(mockUser);
-    setRatings(mockRatings);
-    setItems(mockItems);
-    setLoading(false);
+      const data = await res.json();
+      setUser(data.user);
+      setRatings(data.ratings || []);
+      setItems(data.items || []);
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
