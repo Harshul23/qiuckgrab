@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
-import { ArrowLeft, Zap, MapPin, Clock, DollarSign, CheckCircle, AlertTriangle, Navigation } from "lucide-react";
+import { ArrowLeft, Zap, MapPin, Clock, IndianRupee, CheckCircle, AlertTriangle, Navigation } from "lucide-react";
 
 interface MeetupLocation {
   name: string;
@@ -212,7 +212,7 @@ export default function MeetupPage({ params }: { params: Promise<{ transactionId
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-gray-500">Amount</p>
-                <p className="text-2xl font-bold">${transaction.escrowAmount.toFixed(2)}</p>
+                <p className="text-2xl font-bold">₹{transaction.escrowAmount.toFixed(2)}</p>
               </div>
               <Badge className="bg-blue-100 text-blue-800">
                 {transaction.status === "ACCEPTED" ? "Ready to Pay" : transaction.status}
@@ -312,8 +312,8 @@ export default function MeetupPage({ params }: { params: Promise<{ transactionId
               onClick={handlePay}
               disabled={paying || !selectedLocation}
             >
-              <DollarSign className="h-5 w-5 mr-2" />
-              {paying ? "Processing..." : `Pay $${transaction.escrowAmount.toFixed(2)} (Escrow)`}
+              <IndianRupee className="h-5 w-5 mr-2" />
+              {paying ? "Processing..." : `Pay ₹${transaction.escrowAmount.toFixed(2)} (Escrow)`}
             </Button>
           )}
 

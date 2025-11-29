@@ -260,7 +260,7 @@ export default function HomePage() {
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg line-clamp-2">{item.name}</CardTitle>
                       <span className="text-xl font-bold text-blue-600">
-                        ${item.price.toFixed(2)}
+                        ₹{item.price.toFixed(2)}
                       </span>
                     </div>
                   </CardHeader>

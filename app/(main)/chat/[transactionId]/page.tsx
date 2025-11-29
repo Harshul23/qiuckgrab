@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, use, useCallback } from "react";
 import Link from "next/link";
 import { Button, Input, Avatar, AvatarFallback, Badge } from "@/components/ui";
-import { ArrowLeft, Send, DollarSign, CheckCircle, MapPin } from "lucide-react";
+import { ArrowLeft, Send, IndianRupee, CheckCircle, MapPin } from "lucide-react";
 
 interface Message {
   id: string;
@@ -196,8 +196,8 @@ export default function ChatPage({ params }: { params: Promise<{ transactionId: 
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="flex items-center text-sm">
-              <DollarSign className="h-4 w-4 mr-1 text-blue-600" />
-              <span className="font-medium">${transaction.escrowAmount.toFixed(2)}</span>
+              <IndianRupee className="h-4 w-4 mr-1 text-blue-600" />
+              <span className="font-medium">₹{transaction.escrowAmount.toFixed(2)}</span>
             </div>
             {transaction.meetupLocation && (
               <div className="flex items-center text-sm">
@@ -210,7 +210,7 @@ export default function ChatPage({ params }: { params: Promise<{ transactionId: 
             {transaction.status === "ACCEPTED" && (
               <Link href={`/meetup/${transactionId}`}>
                 <Button size="sm">
-                  <DollarSign className="h-4 w-4 mr-1" />
+                  <IndianRupee className="h-4 w-4 mr-1" />
                   Pay & Meet
                 </Button>
               </Link>

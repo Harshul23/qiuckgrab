@@ -291,7 +291,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                           </div>
                         </div>
                         <span className="text-xl font-bold text-blue-600">
-                          ${item.price.toFixed(2)}
+                          ₹{item.price.toFixed(2)}
                         </span>
                       </div>
                     </CardContent>

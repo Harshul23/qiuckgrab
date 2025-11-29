@@ -53,7 +53,7 @@ export async function checkItemPrice(
           role: "user",
           content: `Check if this price is fair:
 Item: ${itemName}
-Listed Price: $${price}
+Listed Price: ₹${price}
 Condition: ${condition}
 
 Analyze and return pricing assessment JSON.`,

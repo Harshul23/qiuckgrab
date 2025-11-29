@@ -193,7 +193,7 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-3xl font-bold text-blue-600">${item.price.toFixed(2)}</p>
+                    <p className="text-3xl font-bold text-blue-600">₹{item.price.toFixed(2)}</p>
                     <Badge className={getPriceRatingColor(item.aiPriceRating)}>
                       {item.aiPriceRating}
                     </Badge>
@@ -204,7 +204,7 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
                 <div className="bg-gray-50 rounded-2xl p-4 mb-4">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Campus Average:</span>
-                    <span className="font-medium">${item.avgCampusPrice?.toFixed(2) || "N/A"}</span>
+                    <span className="font-medium">₹{item.avgCampusPrice?.toFixed(2) || "N/A"}</span>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">{item.priceExplanation}</p>
                 </div>

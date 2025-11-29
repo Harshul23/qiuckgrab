@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Textarea, FileUpload } from "@/components/ui";
-import { ArrowLeft, Zap, DollarSign, Tag } from "lucide-react";
+import { ArrowLeft, Zap, IndianRupee, Tag } from "lucide-react";
 
 const CATEGORIES = [
   "Electronics",
@@ -144,9 +144,9 @@ export default function ListItemPage() {
 
               {/* Price */}
               <div className="space-y-2">
-                <Label htmlFor="price">Price ($) *</Label>
+                <Label htmlFor="price">Price (₹) *</Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <IndianRupee className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="price"
                     type="number"

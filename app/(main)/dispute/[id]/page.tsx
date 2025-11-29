@@ -211,7 +211,7 @@ export default function DisputePage({ params }: { params: Promise<{ id: string }
                   <div>
                     <h2 className="text-xl font-bold">Dispute #{dispute.id.slice(-6)}</h2>
                     <p className="text-sm text-gray-500">
-                      {dispute.transaction.item.name} - ${dispute.transaction.item.price}
+                      {dispute.transaction.item.name} - ₹{dispute.transaction.item.price}
                     </p>
                   </div>
                   {getDecisionBadge(dispute.decision)}

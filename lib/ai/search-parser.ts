@@ -100,7 +100,7 @@ function fallbackQueryParse(query: string): ParsedQuery {
 
   // Extract price range
   let priceRange: { min?: number; max?: number } | undefined;
-  const priceMatch = lowerQuery.match(/under\s*\$?(\d+)|below\s*\$?(\d+)|max\s*\$?(\d+)/);
+  const priceMatch = lowerQuery.match(/under\s*₹?(\d+)|below\s*₹?(\d+)|max\s*₹?(\d+)/);
   if (priceMatch) {
     const maxPrice = parseInt(priceMatch[1] || priceMatch[2] || priceMatch[3]);
     priceRange = { max: maxPrice };
@@ -108,7 +108,7 @@ function fallbackQueryParse(query: string): ParsedQuery {
 
   // Extract keywords
   const keywords = query
-    .replace(/urgent|asap|need|want|looking for|under \$?\d+/gi, "")
+    .replace(/urgent|asap|need|want|looking for|under ₹?\d+/gi, "")
     .trim()
     .split(/\s+/)
     .filter((word) => word.length > 2);
