@@ -14,10 +14,7 @@ export default function LandingPage() {
             <Zap className="h-8 w-8 text-orange-600" />
             <span className="text-2xl font-bold text-gray-900">QuickGrab</span>
           </div>
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/home" className="text-gray-600 hover:text-gray-900">Browse</Link>
-            <Link href="/list-item" className="text-gray-600 hover:text-gray-900">Sell</Link>
-          </nav>
+         
           <div className="flex items-center space-x-4">
             <Link href="/signup">
               <Button variant="outline" className="rounded-2xl">Sign Up</Button>
