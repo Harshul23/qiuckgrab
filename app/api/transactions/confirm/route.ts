@@ -1,25 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { confirmTransactionSchema } from "@/lib/validators";
 import { prisma } from "@/lib/db";
-import { verify } from "jsonwebtoken";
+import { getUserFromRequest } from "@/lib/auth";
 import { calculateTrustScore, getEarnedBadges } from "@/lib/services/trust-engine";
 
-const JWT_SECRET = process.env.JWT_SECRET || "quickgrab-secret-key-change-in-production";
 
-async function getUserFromRequest(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
-  }
 
-  const token = authHeader.slice(7);
-  try {
-    const decoded = verify(token, JWT_SECRET) as { userId: string };
-    return decoded.userId;
-  } catch {
-    return null;
-  }
-}
 
 // POST /api/transactions/confirm - Buyer confirms item received
 export async function POST(request: NextRequest) {

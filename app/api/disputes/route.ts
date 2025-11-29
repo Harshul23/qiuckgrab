@@ -1,25 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createDisputeSchema } from "@/lib/validators";
 import { prisma } from "@/lib/db";
-import { verify } from "jsonwebtoken";
+import { getUserFromRequest } from "@/lib/auth";
 import { resolveDispute } from "@/lib/ai/moderation";
 
-const JWT_SECRET = process.env.JWT_SECRET || "quickgrab-secret-key-change-in-production";
 
-async function getUserFromRequest(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
-  }
 
-  const token = authHeader.slice(7);
-  try {
-    const decoded = verify(token, JWT_SECRET) as { userId: string };
-    return decoded.userId;
-  } catch {
-    return null;
-  }
-}
 
 // POST /api/disputes - Create a new dispute
 export async function POST(request: NextRequest) {

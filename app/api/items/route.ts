@@ -2,25 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createItemSchema } from "@/lib/validators";
 import { prisma } from "@/lib/db";
 import { checkItemPrice } from "@/lib/ai/price-checker";
-import { verify } from "jsonwebtoken";
+import { getUserFromRequest } from "@/lib/auth";
 
-const JWT_SECRET = process.env.JWT_SECRET || "quickgrab-secret-key-change-in-production";
 
 // Helper to get user from token
-async function getUserFromRequest(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
-  }
 
-  const token = authHeader.slice(7);
-  try {
-    const decoded = verify(token, JWT_SECRET) as { userId: string };
-    return decoded.userId;
-  } catch {
-    return null;
-  }
-}
 
 // POST /api/items - Create a new item listing
 export async function POST(request: NextRequest) {

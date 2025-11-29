@@ -2,11 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { loginSchema } from "@/lib/validators";
 import { prisma } from "@/lib/db";
 import { compare } from "bcryptjs";
-import { sign } from "jsonwebtoken";
+import { createToken } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
-
-const JWT_SECRET = process.env.JWT_SECRET || "quickgrab-secret-key-change-in-production";
-const TOKEN_EXPIRY = "7d";
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,11 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
-    const token = sign(
-      { userId: user.id, email: user.email },
-      JWT_SECRET,
-      { expiresIn: TOKEN_EXPIRY }
-    );
+    const token = createToken(user.id);
 
     // Create session
     const sessionId = uuidv4();

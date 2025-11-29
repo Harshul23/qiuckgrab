@@ -1,25 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { payTransactionSchema } from "@/lib/validators";
 import { prisma } from "@/lib/db";
-import { verify } from "jsonwebtoken";
+import { getUserFromRequest } from "@/lib/auth";
 
-const JWT_SECRET = process.env.JWT_SECRET || "quickgrab-secret-key-change-in-production";
 const MEETUP_TIMEOUT_HOURS = 24; // Time for meetup before auto-refund option
 
-async function getUserFromRequest(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
-  }
 
-  const token = authHeader.slice(7);
-  try {
-    const decoded = verify(token, JWT_SECRET) as { userId: string };
-    return decoded.userId;
-  } catch {
-    return null;
-  }
-}
 
 // POST /api/transactions/pay - Buyer pays for item (escrow lock)
 export async function POST(request: NextRequest) {

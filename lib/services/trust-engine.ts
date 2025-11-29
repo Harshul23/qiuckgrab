@@ -18,10 +18,13 @@ interface BadgeEligibility {
   description: string;
 }
 
+// Constants for badge eligibility
+const QUICK_RESPONDER_MAX_SECONDS = 300; // 5 minutes average response time
+
 // Badge definitions from idea.md
 const BADGES = {
   TRUSTED_SELLER: { name: "Trusted Seller", emoji: "🏆", minDeals: 50, minRating: 4.8 },
-  QUICK_RESPONDER: { name: "Quick Responder", emoji: "⚡", avgResponseTime: 300 }, // 5 minutes
+  QUICK_RESPONDER: { name: "Quick Responder", emoji: "⚡", avgResponseTime: QUICK_RESPONDER_MAX_SECONDS },
   FAIR_PRICER: { name: "Fair Pricer", emoji: "💎", minFairPriceRate: 0.9 },
   PERFECT_SUCCESS: { name: "100% Success Rate", emoji: "🎯", successRate: 1.0 },
 };
