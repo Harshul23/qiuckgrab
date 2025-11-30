@@ -350,8 +350,7 @@ export default function HomePage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              {activeTab === "marketplace" && "Campus Marketplace"}
-              {activeTab === "lost-found" && "Lost & Found"}
+              {activeTab === "marketplace" ? "Campus Marketplace" : "Lost & Found"}
             </h1>
             <p className="text-muted-foreground">{activeTabData?.description}</p>
           </div>
