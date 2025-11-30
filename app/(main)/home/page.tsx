@@ -108,6 +108,15 @@ export default function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleLogout = () => {
+    // Clear user session data from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setCurrentUser(null);
+    // Redirect to home page after logout
+    router.replace("/home");
+  };
+
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) {
@@ -345,7 +354,7 @@ export default function HomePage() {
               <Mic className="h-5 w-5" />
             </button>
           </div>
-          <Button type="submit" disabled={loading} className="bg-orange-600 hover:bg-orange-700">
+          <Button type="submit" disabled={loading} className="bg-orange-600 hover:bg-orange-700 rounded-full">
             <Search className="h-4 w-4 mr-2" />
             Search
           </Button>
@@ -410,7 +419,7 @@ function MarketplaceItemCard({ item }: { item: Item }) {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
       {/* Item Image */}
       <Link href={`/item/${item.id}`}>
-        <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+  <div className="aspect-4/3 bg-gray-100 relative overflow-hidden">
           {item.photo ? (
             <img
               src={item.photo}

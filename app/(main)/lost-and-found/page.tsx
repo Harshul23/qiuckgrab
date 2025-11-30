@@ -104,6 +104,14 @@ export default function LostAndFoundPage() {
     fetchPosts(1, false);
   }, [fetchPosts]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setCurrentUser(null);
+    // Redirect to home page after logout
+    router.replace("/home");
+  };
+
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     // Search is handled client-side by filtering posts, server-side search can be added later
@@ -253,7 +261,8 @@ export default function LostAndFoundPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button type="submit" disabled={loading} className="bg-orange-600 hover:bg-orange-700">
+          {/* Rounded search button */}
+          <Button type="submit" disabled={loading} className="bg-orange-600 hover:bg-orange-700 rounded-full">
             <Search className="h-4 w-4 mr-2" />
             Search
           </Button>
@@ -303,7 +312,7 @@ export default function LostAndFoundPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
-                <div className="aspect-[4/3] bg-gray-200"></div>
+                <div className="aspect-4/3 bg-gray-200"></div>
                 <div className="p-4">
                   <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
                   <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
@@ -332,7 +341,7 @@ export default function LostAndFoundPage() {
                 <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                   {/* Post Image */}
                   <Link href={`/lost-and-found/${post.id}`}>
-                    <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+                    <div className="aspect-4/3 bg-gray-100 relative overflow-hidden">
                       {post.photo ? (
                         <img
                           src={post.photo}
