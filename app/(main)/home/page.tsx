@@ -266,6 +266,9 @@ export default function HomePage() {
               <span className="text-2xl font-bold">QuickGrab</span>
             </Link>
             <div className="flex items-center space-x-4">
+              <Link href="/lost-and-found">
+                <Button variant="outline">Lost & Found</Button>
+              </Link>
               <Link href="/list-item">
                 <Button>List Item</Button>
               </Link>

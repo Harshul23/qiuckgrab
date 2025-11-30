@@ -53,6 +53,17 @@ enum DisputeDecision {
   DISMISSED
 }
 
+enum LostFoundType {
+  LOST
+  FOUND
+}
+
+enum LostFoundStatus {
+  ACTIVE
+  RESOLVED
+  EXPIRED
+}
+
 // Models according to idea.md
 
 model User {
@@ -87,6 +98,7 @@ model User {
   ratingsGiven       Rating[]            @relation("RatingsGiven")
   ratingsReceived    Rating[]            @relation("RatingsReceived")
   sentMessages       Message[]           @relation("SentMessages")
+  lostFoundPosts     LostFoundPost[]
 
   @@index([email])
   @@index([college])
@@ -214,4 +226,32 @@ model Session {
 
   @@index([userId])
   @@index([token])
+}
+
+// Lost and Found model
+model LostFoundPost {
+  id          String          @id @default(uuid())
+  userId      String
+  type        LostFoundType   // LOST or FOUND
+  title       String
+  description String?
+  category    String
+  photo       String?
+  photos      String[]        @default([])
+  location    String?         // Where item was lost/found
+  locationLat Float?
+  locationLng Float?
+  date        DateTime?       // When item was lost/found
+  contactInfo String?         // Optional contact info
+  status      LostFoundStatus @default(ACTIVE)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([category])
 }

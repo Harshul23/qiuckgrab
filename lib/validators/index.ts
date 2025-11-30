@@ -111,6 +111,23 @@ export const sendMessageSchema = z.object({
   content: z.string().min(1).max(1000, "Message too long"),
 });
 
+// Lost and Found validators
+export const createLostFoundSchema = z.object({
+  type: z.enum(["LOST", "FOUND"]),
+  title: z.string().min(2, "Title must be at least 2 characters"),
+  description: z.string().optional(),
+  category: z.string().min(1, "Category is required"),
+  photo: urlOrDataUrl.optional(),
+  photos: z.array(urlOrDataUrl).optional(),
+  location: z.string().optional(),
+  date: z.string().optional(),
+  contactInfo: z.string().optional(),
+});
+
+export const updateLostFoundSchema = createLostFoundSchema.partial().extend({
+  status: z.enum(["ACTIVE", "RESOLVED", "EXPIRED"]).optional(),
+});
+
 // Type exports
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -123,3 +140,5 @@ export type CreateRatingInput = z.infer<typeof createRatingSchema>;
 export type CreateDisputeInput = z.infer<typeof createDisputeSchema>;
 export type SearchInput = z.infer<typeof searchSchema>;
 export type SendMessageInput = z.infer<typeof sendMessageSchema>;
+export type CreateLostFoundInput = z.infer<typeof createLostFoundSchema>;
+export type UpdateLostFoundInput = z.infer<typeof updateLostFoundSchema>;
