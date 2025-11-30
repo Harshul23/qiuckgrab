@@ -259,16 +259,6 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/home" className="flex items-center space-x-2">
-              <Zap className="h-8 w-8 text-orange-500" />
-              <span className="text-2xl font-bold">QuickGrab</span>
-            </Link>
-            <div className="flex items-center space-x-4">
-              <Link href="/lost-and-found">
-                <Button variant="outline">Lost & Found</Button>
-              </Link>
-              <Link href="/list-item">
-                <Button>List Item</Button>
-              </Link>
               <div className="bg-orange-600 p-2 rounded-lg">
                 <Zap className="h-6 w-6 text-white" />
               </div>
@@ -422,7 +412,6 @@ export default function HomePage() {
             {hasMore && !isSearchMode.current && (
               <div ref={observerTarget} className="h-10 flex items-center justify-center py-8">
                 {loadingMore && (
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
                 )}
               </div>

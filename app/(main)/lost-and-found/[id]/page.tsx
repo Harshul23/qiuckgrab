@@ -149,7 +149,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
       </div>
     );
   }
@@ -160,7 +160,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Post Not Found</h1>
           <Link href="/lost-and-found">
-            <Button>Back to Lost & Found</Button>
+            <Button className="bg-orange-600 hover:bg-orange-700">Back to Lost & Found</Button>
           </Link>
         </div>
       </div>
@@ -174,13 +174,17 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link href="/lost-and-found" className="flex items-center text-gray-600 hover:text-gray-900">
+          <Link href="/lost-and-found" className="flex items-center text-gray-600 hover:text-orange-600">
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back
           </Link>
           <div className="flex-1 flex items-center justify-center">
-            <Zap className="h-6 w-6 text-orange-500 mr-2" />
-            <span className="font-bold">QuickGrab</span>
+            <Link href="/home" className="flex items-center space-x-2">
+              <div className="bg-orange-600 p-1.5 rounded-lg">
+                <Zap className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-gray-900">QuickGrab</span>
+            </Link>
           </div>
           <div className="w-20"></div>
         </div>
@@ -297,7 +301,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
                 {isOwner && post.status === "ACTIVE" && (
                   <div className="flex gap-2">
                     <Button
-                      className="flex-1"
+                      className="flex-1 bg-orange-600 hover:bg-orange-700"
                       onClick={handleMarkResolved}
                       disabled={updating}
                     >
@@ -324,7 +328,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
                         : "If this is your item, contact the finder!"}
                     </p>
                     <Link href={`/profile/${post.user.id}`}>
-                      <Button size="lg" className="w-full">
+                      <Button size="lg" className="w-full bg-orange-600 hover:bg-orange-700">
                         <MessageCircle className="h-5 w-5 mr-2" />
                         View Profile & Contact
                       </Button>
@@ -343,7 +347,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
                 <Link href={`/profile/${post.user.id}`}>
                   <div className="flex items-center space-x-4 hover:bg-gray-50 p-2 rounded-2xl -m-2">
                     <Avatar className="h-16 w-16">
-                      <AvatarFallback className="text-lg">
+                      <AvatarFallback className="text-lg bg-orange-100 text-orange-600">
                         {post.user.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>

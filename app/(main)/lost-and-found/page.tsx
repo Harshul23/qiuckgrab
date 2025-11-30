@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle, Badge, Avatar, AvatarFallback, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui";
-import { Search, Zap, MapPin, Calendar, User, LogOut, Plus, Eye, Package } from "lucide-react";
+import { Button, Input, Badge, Avatar, AvatarFallback, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui";
+import { Search, Zap, MapPin, Calendar, User, LogOut, Plus, Package, Filter, ShoppingBag, HelpCircle } from "lucide-react";
 
 interface LostFoundPost {
   id: string;
@@ -32,6 +32,14 @@ interface AuthUser {
   email: string;
   photo: string | null;
 }
+
+type TabType = "marketplace" | "campus-relay" | "lost-found";
+
+const TABS: { id: TabType; label: string; icon: React.ReactNode; href: string }[] = [
+  { id: "marketplace", label: "Marketplace", icon: <ShoppingBag className="h-5 w-5" />, href: "/home" },
+  { id: "campus-relay", label: "Campus Relay", icon: <Zap className="h-5 w-5" />, href: "/home" },
+  { id: "lost-found", label: "Lost & Found", icon: <HelpCircle className="h-5 w-5" />, href: "/lost-and-found" },
+];
 
 const CATEGORIES = [
   "All",
@@ -174,24 +182,23 @@ export default function LostAndFoundPage() {
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between">
             <Link href="/home" className="flex items-center space-x-2">
-              <Zap className="h-8 w-8 text-orange-500" />
-              <span className="text-2xl font-bold">QuickGrab</span>
+              <div className="bg-orange-600 p-2 rounded-lg">
+                <Zap className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold text-gray-900">QuickGrab</span>
+                <span className="text-xs text-gray-500">Campus Marketplace</span>
+              </div>
             </Link>
             <div className="flex items-center space-x-4">
-              <Link href="/report-item">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Report Item
-                </Button>
-              </Link>
               {currentUser ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-full">
                       <Avatar>
-                        <AvatarFallback>{currentUser.name?.charAt(0) || "U"}</AvatarFallback>
+                        <AvatarFallback className="bg-orange-100 text-orange-600">{currentUser.name?.charAt(0) || "U"}</AvatarFallback>
                       </Avatar>
                     </button>
                   </DropdownMenuTrigger>
@@ -219,105 +226,144 @@ export default function LostAndFoundPage() {
               ) : (
                 <Link href="/signin">
                   <Avatar>
-                    <AvatarFallback>U</AvatarFallback>
+                    <AvatarFallback className="bg-orange-100 text-orange-600">U</AvatarFallback>
                   </Avatar>
                 </Link>
               )}
             </div>
           </div>
-
-          {/* Title and Search */}
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold mb-2">Lost & Found</h1>
-            <p className="text-gray-600 text-sm">Help fellow students find their lost items or report items you&apos;ve found</p>
-          </div>
-
-          <form onSubmit={handleSearch} className="flex gap-2 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-              <Input
-                placeholder="Search lost & found items..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Button type="submit" disabled={loading}>
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-          </form>
-
-          {/* Type Filter */}
-          <div className="flex gap-2 mb-4">
-            {(["ALL", "LOST", "FOUND"] as const).map((type) => (
-              <Button
-                key={type}
-                variant={activeType === type ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  setActiveType(type);
-                  setPage(1);
-                }}
-              >
-                {type === "ALL" ? "All" : type === "LOST" ? "🔍 Lost Items" : "✅ Found Items"}
-              </Button>
-            ))}
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {CATEGORIES.map((cat) => (
-              <Button
-                key={cat}
-                variant={activeCategory === cat ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  setActiveCategory(cat);
-                  setPage(1);
-                }}
-                className="whitespace-nowrap"
-              >
-                {cat}
-              </Button>
-            ))}
-          </div>
         </div>
       </header>
 
+      {/* Tab Navigation */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4">
+          <nav className="flex space-x-8">
+            {TABS.map((tab) => (
+              <Link
+                key={tab.id}
+                href={tab.href}
+                className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
+                  tab.id === "lost-found"
+                    ? "border-orange-600 text-orange-600"
+                    : "border-transparent text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                {tab.icon}
+                <span className="font-medium">{tab.label}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </div>
+
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Section Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Lost & Found</h1>
+            <p className="text-gray-600">Help fellow students find their lost items or report items you&apos;ve found</p>
+          </div>
+          <Link href="/report-item">
+            <Button className="bg-orange-600 hover:bg-orange-700 text-white rounded-full">
+              <Plus className="h-4 w-4 mr-2" />
+              Report Item
+            </Button>
+          </Link>
+        </div>
+
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} className="flex gap-2 mb-8">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <Input
+              placeholder="Search for items... (e.g., 'lost iPhone charger near library')"
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <Button type="submit" disabled={loading} className="bg-orange-600 hover:bg-orange-700">
+            <Search className="h-4 w-4 mr-2" />
+            Search
+          </Button>
+          <Button type="button" variant="outline">
+            <Filter className="h-4 w-4" />
+          </Button>
+        </form>
+
+        {/* Type Filter */}
+        <div className="flex gap-2 mb-4">
+          {(["ALL", "LOST", "FOUND"] as const).map((type) => (
+            <Button
+              key={type}
+              variant={activeType === type ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setActiveType(type);
+                setPage(1);
+              }}
+              className={activeType === type ? "bg-orange-600 hover:bg-orange-700" : ""}
+            >
+              {type === "ALL" ? "All Items" : type === "LOST" ? "🔍 Lost Items" : "✅ Found Items"}
+            </Button>
+          ))}
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex gap-2 overflow-x-auto pb-4 mb-6">
+          {CATEGORIES.map((cat) => (
+            <Button
+              key={cat}
+              variant={activeCategory === cat ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setActiveCategory(cat);
+                setPage(1);
+              }}
+              className={`whitespace-nowrap ${activeCategory === cat ? "bg-orange-600 hover:bg-orange-700" : ""}`}
+            >
+              {cat}
+            </Button>
+          ))}
+        </div>
+
+        {/* Items Grid */}
         {loading && posts.length === 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg p-4 animate-pulse">
-                <div className="aspect-video bg-gray-200 rounded-lg mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
+                <div className="aspect-[4/3] bg-gray-200"></div>
+                <div className="p-4">
+                  <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                  <div className="h-10 bg-gray-200 rounded"></div>
+                </div>
               </div>
             ))}
           </div>
         ) : error && posts.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-red-500 mb-4">{error}</p>
-            <Button onClick={() => fetchPosts(1, false)}>Retry</Button>
+            <Button onClick={() => fetchPosts(1, false)} className="bg-orange-600 hover:bg-orange-700">Retry</Button>
           </div>
         ) : filteredPosts.length === 0 && !loading ? (
           <div className="text-center py-20">
             <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 mb-4">No posts found</p>
             <Link href="/report-item">
-              <Button>Report a Lost or Found Item</Button>
+              <Button className="bg-orange-600 hover:bg-orange-700">Report a Lost or Found Item</Button>
             </Link>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPosts.map((post) => (
-                <Link key={post.id} href={`/lost-and-found/${post.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow h-full">
-                    {/* Post Image */}
-                    <div className="aspect-video bg-gray-100 relative overflow-hidden rounded-t-lg">
+                <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                  {/* Post Image */}
+                  <Link href={`/lost-and-found/${post.id}`}>
+                    <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
                       {post.photo ? (
                         <img
                           src={post.photo}
@@ -327,79 +373,75 @@ export default function LostAndFoundPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
-                          <Eye className="h-12 w-12" />
+                          <Package className="h-16 w-16" />
                         </div>
                       )}
-                      {/* Type Badge */}
+                      {/* Category Badge */}
+                      <Badge className="absolute top-3 right-3 bg-white text-gray-800 border-0 shadow-sm">
+                        {post.category}
+                      </Badge>
+                    </div>
+                  </Link>
+
+                  {/* Post Details */}
+                  <div className="p-4">
+                    <Link href={`/lost-and-found/${post.id}`}>
+                      <h3 className="font-semibold text-gray-900 text-lg mb-1 hover:text-orange-600 transition-colors line-clamp-1">
+                        {post.title}
+                      </h3>
+                    </Link>
+                    
+                    {/* Type Badge */}
+                    <div className="mb-2">
                       <Badge
                         variant={post.type === "LOST" ? "destructive" : "success"}
-                        className="absolute top-2 left-2"
                       >
                         {post.type === "LOST" ? "🔍 Lost" : "✅ Found"}
                       </Badge>
-                      {/* Status Badge */}
                       {post.status === "RESOLVED" && (
-                        <Badge variant="secondary" className="absolute top-2 right-2">
+                        <Badge variant="secondary" className="ml-2">
                           Resolved
                         </Badge>
                       )}
                     </div>
+                    
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 text-sm mb-4">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      <span>{post.location || "On Campus"}</span>
+                    </div>
 
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg line-clamp-2">{post.title}</CardTitle>
-                    </CardHeader>
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                      <Link href={`/lost-and-found/${post.id}`} className="flex-1">
+                        <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-lg">
+                          View Details
+                        </Button>
+                      </Link>
+                    </div>
 
-                    <CardContent>
-                      {post.description && (
-                        <p className="text-sm text-gray-600 line-clamp-2 mb-3">{post.description}</p>
-                      )}
-
-                      {/* Category */}
-                      <div className="flex gap-2 mb-3">
-                        <Badge variant="outline">{post.category}</Badge>
-                      </div>
-
-                      {/* Location & Date */}
-                      <div className="text-sm text-gray-500 space-y-1 mb-3">
-                        {post.location && (
-                          <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            <span className="truncate">{post.location}</span>
-                          </div>
-                        )}
-                        {post.date && (
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            <span>{formatDate(post.date)}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* User Info */}
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center space-x-2">
-                          <Avatar className="h-6 w-6">
-                            <AvatarFallback className="text-xs">
-                              {post.user.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="flex items-center">
-                              <span className="font-medium">{post.user.name}</span>
-                              {post.user.verificationStatus === "VERIFIED" && (
-                                <span className="ml-1 text-orange-500">✓</span>
-                              )}
-                            </div>
-                            {post.user.college && (
-                              <span className="text-xs text-gray-400">{post.user.college}</span>
-                            )}
-                          </div>
+                    {/* User Info */}
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-xs bg-orange-100 text-orange-600">
+                            {post.user.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex items-center">
+                          <span className="font-medium text-gray-700">{post.user.name}</span>
+                          {post.user.verificationStatus === "VERIFIED" && (
+                            <span className="ml-1 text-orange-500">✓</span>
+                          )}
                         </div>
-                        <span className="text-xs text-gray-400">{formatDate(post.createdAt)}</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                      <div className="flex items-center text-gray-400 text-xs">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        <span>{formatDate(post.createdAt)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
 
@@ -407,7 +449,7 @@ export default function LostAndFoundPage() {
             {hasMore && (
               <div ref={observerTarget} className="h-10 flex items-center justify-center py-8">
                 {loadingMore && (
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
                 )}
               </div>
             )}
