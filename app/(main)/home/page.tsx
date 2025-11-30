@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Input, Badge, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel, Avatar, AvatarFallback } from "@/components/ui";
 import { ItemCardSkeleton } from "@/components/ui/item-card-skeleton";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { type Item } from "@/components/item-card";
 import { Search, Zap, Filter, Mic, User, LogOut, MapPin, Share2, ShoppingBag, Package, HelpCircle, Plus } from "lucide-react";
 
@@ -252,9 +253,9 @@ export default function HomePage() {
   const activeTabData = TABS.find(tab => tab.id === activeTab);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
+      <header className="bg-card border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/home" className="flex items-center space-x-2">
@@ -262,17 +263,18 @@ export default function HomePage() {
                 <Zap className="h-6 w-6 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold text-gray-900">QuickGrab</span>
-                <span className="text-xs text-gray-500">Campus Marketplace</span>
+                <span className="text-xl font-bold text-foreground">QuickGrab</span>
+                <span className="text-xs text-muted-foreground">Campus Marketplace</span>
               </div>
             </Link>
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               {currentUser ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-full">
                       <Avatar>
-                        <AvatarFallback className="bg-orange-100 text-orange-600">{currentUser.name?.charAt(0) || "U"}</AvatarFallback>
+                        <AvatarFallback className="bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-300">{currentUser.name?.charAt(0) || "U"}</AvatarFallback>
                       </Avatar>
                     </button>
                   </DropdownMenuTrigger>
@@ -280,7 +282,7 @@ export default function HomePage() {
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">{currentUser.name}</p>
-                        <p className="text-xs leading-none text-gray-500">{currentUser.email}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{currentUser.email}</p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
@@ -291,7 +293,7 @@ export default function HomePage() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
@@ -300,7 +302,7 @@ export default function HomePage() {
               ) : (
                 <Link href="/signin">
                   <Avatar>
-                    <AvatarFallback className="bg-orange-100 text-orange-600">U</AvatarFallback>
+                    <AvatarFallback className="bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-300">U</AvatarFallback>
                   </Avatar>
                 </Link>
               )}
@@ -310,7 +312,7 @@ export default function HomePage() {
       </header>
 
       {/* Tab Navigation */}
-      <div className="bg-white border-b">
+      <div className="bg-card border-b">
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8">
             {TABS.map((tab) => (
@@ -318,7 +320,7 @@ export default function HomePage() {
                 <Link
                   key={tab.id}
                   href="/lost-and-found"
-                  className={`flex items-center space-x-2 py-4 border-b-2 transition-colors border-transparent text-gray-600 hover:text-gray-900`}
+                  className={`flex items-center space-x-2 py-4 border-b-2 transition-colors border-transparent text-muted-foreground hover:text-foreground`}
                 >
                   {tab.icon}
                   <span className="font-medium">{tab.label}</span>
@@ -330,7 +332,7 @@ export default function HomePage() {
                   className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
                     activeTab === tab.id
                       ? "border-orange-600 text-orange-600"
-                      : "border-transparent text-gray-600 hover:text-gray-900"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {tab.icon}
@@ -347,11 +349,11 @@ export default function HomePage() {
         {/* Section Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-foreground">
               {activeTab === "marketplace" && "Campus Marketplace"}
               {activeTab === "lost-found" && "Lost & Found"}
             </h1>
-            <p className="text-gray-600">{activeTabData?.description}</p>
+            <p className="text-muted-foreground">{activeTabData?.description}</p>
           </div>
           <Link href="/list-item">
             <Button className="bg-orange-600 hover:bg-orange-700 text-white rounded-full">
@@ -364,7 +366,7 @@ export default function HomePage() {
         {/* Search Bar - Optional, can be hidden in mobile */}
         <form onSubmit={handleSearch} className="flex gap-2 mb-8">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
             <Input
               placeholder="Search for items... (e.g., 'need iPhone charger urgent')"
               className="pl-10 pr-12"
@@ -375,7 +377,7 @@ export default function HomePage() {
               type="button"
               onClick={startVoiceSearch}
               className={`absolute right-3 top-2.5 p-1 rounded-full ${
-                isListening ? "bg-red-100 text-red-600" : "text-gray-400 hover:text-gray-600"
+                isListening ? "bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Mic className="h-5 w-5" />
@@ -404,8 +406,8 @@ export default function HomePage() {
           </div>
         ) : items.length === 0 && !loading ? (
           <div className="text-center py-20">
-            <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-4">No items found</p>
+            <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground mb-4">No items found</p>
             <Link href="/list-item">
               <Button className="bg-orange-600 hover:bg-orange-700">Be the first to list an item</Button>
             </Link>
@@ -443,10 +445,10 @@ export default function HomePage() {
 // New marketplace-style item card component
 function MarketplaceItemCard({ item }: { item: Item }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow">
       {/* Item Image */}
       <Link href={`/item/${item.id}`}>
-        <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+        <div className="aspect-[4/3] bg-muted relative overflow-hidden">
           {item.photo ? (
             <img
               src={item.photo}
@@ -455,12 +457,12 @@ function MarketplaceItemCard({ item }: { item: Item }) {
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
               <Package className="h-16 w-16" />
             </div>
           )}
           {/* Category Badge */}
-          <Badge className="absolute top-3 right-3 bg-white text-gray-800 border-0 shadow-sm">
+          <Badge className="absolute top-3 right-3 bg-card text-card-foreground border-0 shadow-sm">
             {item.category}
           </Badge>
         </div>
@@ -469,14 +471,14 @@ function MarketplaceItemCard({ item }: { item: Item }) {
       {/* Item Details */}
       <div className="p-4">
         <Link href={`/item/${item.id}`}>
-          <h3 className="font-semibold text-gray-900 text-lg mb-1 hover:text-orange-600 transition-colors line-clamp-1">
+          <h3 className="font-semibold text-foreground text-lg mb-1 hover:text-orange-600 transition-colors line-clamp-1">
             {item.name}
           </h3>
         </Link>
         <p className="text-2xl font-bold text-orange-600 mb-2">₹{item.price}</p>
         
         {/* Location - Use first seller badge if available, otherwise show "On Campus" */}
-        <div className="flex items-center text-gray-500 text-sm mb-4">
+        <div className="flex items-center text-muted-foreground text-sm mb-4">
           <MapPin className="h-4 w-4 mr-1" />
           <span>{item.seller.badges?.[0] || "On Campus"}</span>
         </div>
@@ -488,8 +490,8 @@ function MarketplaceItemCard({ item }: { item: Item }) {
               Buy
             </Button>
           </Link>
-          <Button variant="outline" size="icon" className="rounded-lg border-gray-200">
-            <Share2 className="h-4 w-4 text-gray-600" />
+          <Button variant="outline" size="icon" className="rounded-lg">
+            <Share2 className="h-4 w-4" />
           </Button>
         </div>
       </div>

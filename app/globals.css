@@ -132,6 +132,22 @@ body {
   --tw-ring-offset-color: hsl(var(--background));
 }
 
+.bg-popover {
+  background-color: hsl(var(--popover));
+}
+
+.text-popover-foreground {
+  color: hsl(var(--popover-foreground));
+}
+
+.border-border {
+  border-color: hsl(var(--border));
+}
+
+.bg-border {
+  background-color: hsl(var(--border));
+}
+
 /* Splash Animation Styles */
 @keyframes splash-bounce-in {
   0% {
