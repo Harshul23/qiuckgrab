@@ -15,11 +15,10 @@ interface AuthUser {
   photo: string | null;
 }
 
-type TabType = "marketplace" | "campus-relay" | "lost-found";
+type TabType = "marketplace" | "lost-found";
 
 const TABS: { id: TabType; label: string; icon: React.ReactNode; description: string }[] = [
   { id: "marketplace", label: "Marketplace", icon: <ShoppingBag className="h-5 w-5" />, description: "Buy and sell items with verified students" },
-  { id: "campus-relay", label: "Campus Relay", icon: <Zap className="h-5 w-5" />, description: "Get items delivered by fellow students" },
   { id: "lost-found", label: "Lost & Found", icon: <HelpCircle className="h-5 w-5" />, description: "Report or find lost items on campus" },
 ];
 
@@ -259,16 +258,6 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/home" className="flex items-center space-x-2">
-              <Zap className="h-8 w-8 text-orange-500" />
-              <span className="text-2xl font-bold">QuickGrab</span>
-            </Link>
-            <div className="flex items-center space-x-4">
-              <Link href="/lost-and-found">
-                <Button variant="outline">Lost & Found</Button>
-              </Link>
-              <Link href="/list-item">
-                <Button>List Item</Button>
-              </Link>
               <div className="bg-orange-600 p-2 rounded-lg">
                 <Zap className="h-6 w-6 text-white" />
               </div>
@@ -325,18 +314,29 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8">
             {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? "border-orange-600 text-orange-600"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                {tab.icon}
-                <span className="font-medium">{tab.label}</span>
-              </button>
+              tab.id === "lost-found" ? (
+                <Link
+                  key={tab.id}
+                  href="/lost-and-found"
+                  className={`flex items-center space-x-2 py-4 border-b-2 transition-colors border-transparent text-gray-600 hover:text-gray-900`}
+                >
+                  {tab.icon}
+                  <span className="font-medium">{tab.label}</span>
+                </Link>
+              ) : (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? "border-orange-600 text-orange-600"
+                      : "border-transparent text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  {tab.icon}
+                  <span className="font-medium">{tab.label}</span>
+                </button>
+              )
             ))}
           </nav>
         </div>
@@ -422,7 +422,6 @@ export default function HomePage() {
             {hasMore && !isSearchMode.current && (
               <div ref={observerTarget} className="h-10 flex items-center justify-center py-8">
                 {loadingMore && (
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
                 )}
               </div>
