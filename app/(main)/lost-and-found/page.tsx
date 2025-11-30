@@ -33,11 +33,10 @@ interface AuthUser {
   photo: string | null;
 }
 
-type TabType = "marketplace" | "campus-relay" | "lost-found";
+type TabType = "marketplace" | "lost-found";
 
 const TABS: { id: TabType; label: string; icon: React.ReactNode; href: string }[] = [
   { id: "marketplace", label: "Marketplace", icon: <ShoppingBag className="h-5 w-5" />, href: "/home" },
-  { id: "campus-relay", label: "Campus Relay", icon: <Zap className="h-5 w-5" />, href: "/home" },
   { id: "lost-found", label: "Lost & Found", icon: <HelpCircle className="h-5 w-5" />, href: "/lost-and-found" },
 ];
 
