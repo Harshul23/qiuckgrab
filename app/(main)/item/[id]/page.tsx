@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Avatar, AvatarFallback, Textarea } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Avatar, AvatarFallback } from "@/components/ui";
 import { ArrowLeft, Star, Shield, Clock, MessageCircle, Zap, CheckCircle } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 interface ItemDetails {
   id: string;
@@ -37,36 +38,34 @@ interface ItemDetails {
 export default function ItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { token, requireAuth } = useAuth();
   const [item, setItem] = useState<ItemDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
-  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    fetchItem();
-  }, [id]);
-
-  const fetchItem = async () => {
+  const fetchItem = useCallback(async () => {
     try {
       const res = await fetch(`/api/items/${id}`);
       const data = await res.json();
       setItem(data.item);
-    } catch (error) {
+    } catch {
       // Error handled silently
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchItem();
+  }, [fetchItem]);
 
   const handleRequest = async () => {
+    if (!requireAuth()) {
+      return;
+    }
+
     setRequesting(true);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "/signin";
-        return;
-      }
-
       const res = await fetch("/api/transactions/request", {
         method: "POST",
         headers: {

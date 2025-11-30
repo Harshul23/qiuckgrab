@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Textarea, FileUpload } from "@/components/ui";
 import { ArrowLeft, Zap, IndianRupee, Tag, CheckCircle } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 const CATEGORIES = [
   "Electronics",
@@ -28,6 +29,7 @@ const CONDITIONS = [
 
 export default function ListItemPage() {
   const router = useRouter();
+  const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +41,13 @@ export default function ListItemPage() {
     condition: "GOOD",
     photo: "",
   });
+
+  // Redirect to signin if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/signin");
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   // Handle file selection and convert to data URL
   const handleFileSelect = useCallback((file: File | null) => {
@@ -63,9 +72,8 @@ export default function ListItemPage() {
     setError(null);
     setSuccess(false);
 
-    const token = localStorage.getItem("token");
     if (!token) {
-      window.location.href = "/signin";
+      router.push("/signin");
       return;
     }
 
@@ -114,6 +122,24 @@ export default function ListItemPage() {
       setLoading(false);
     }
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      </div>
+    );
+  }
+
+  // Don't render the form if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

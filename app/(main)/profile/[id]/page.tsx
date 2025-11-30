@@ -2,7 +2,6 @@
 
 import { useState, useEffect, use, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -22,6 +21,7 @@ import {
   LogOut,
   MessageCircle,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 interface UserProfile {
   id: string;
@@ -58,45 +58,50 @@ interface Item {
   availabilityStatus: string;
 }
 
+interface Transaction {
+  id: string;
+  status: string;
+  escrowAmount: number;
+  meetupLocation: string | null;
+  latestMessage: {
+    senderId: string;
+    senderName: string;
+    content: string;
+  } | null;
+  role: "buyer" | "seller";
+  item: {
+    name: string;
+  };
+  otherParty: {
+    name: string;
+  };
+}
+
 export default function ProfilePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const router = useRouter();
+  const { user: currentUser, token, logout } = useAuth();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [items, setItems] = useState<Item[]>([]);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState<"listings" | "reviews" | "chats">(
     "listings"
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isOwnProfile, setIsOwnProfile] = useState(false);
 
   // Check if viewing own profile
-  useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        const currentUser = JSON.parse(userStr);
-        if (currentUser && currentUser.id === id) {
-          setIsOwnProfile(true);
-        }
-      } catch {
-        // Invalid JSON in localStorage
-      }
-    }
-  }, [id]);
+  const isOwnProfile = currentUser?.id === id;
 
   // Fetch transactions when viewing own profile and chats tab is active
   useEffect(() => {
     if (isOwnProfile && activeTab === "chats") {
       const fetchTransactions = async () => {
         try {
-          const token = localStorage.getItem("token");
           if (!token) return;
 
           const res = await fetch("/api/transactions", {
@@ -109,37 +114,18 @@ export default function ProfilePage({
             const data = await res.json();
             setTransactions(data.transactions || []);
           }
-        } catch (err) {
-          console.error("Failed to fetch transactions:", err);
+        } catch {
+          // Failed to fetch transactions
         }
       };
 
       fetchTransactions();
     }
-  }, [isOwnProfile, activeTab]);
-
-  const handleLogout = () => {
-    // Clear user session data from localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    // Redirect to signin page
-    router.push("/signin");
-  };
+  }, [isOwnProfile, activeTab, token]);
 
   const fetchProfileData = useCallback(async () => {
     try {
       setError(null);
-      // Check if viewing own profile by comparing with current user
-      const userStr = localStorage.getItem("user");
-      let isOwn = false;
-      if (userStr) {
-        try {
-          const currentUser = JSON.parse(userStr);
-          isOwn = currentUser && currentUser.id === id;
-        } catch {
-          // Invalid JSON
-        }
-      }
 
       const res = await fetch(`/api/users/${id}`);
 
@@ -156,7 +142,7 @@ export default function ProfilePage({
       setItems(userData.user.items || []);
 
       // Transactions will be fetched separately when chats tab is active
-    } catch (err) {
+    } catch {
       setError("Failed to connect to server");
     } finally {
       setLoading(false);
@@ -222,7 +208,7 @@ export default function ProfilePage({
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleLogout}
+              onClick={logout}
               className="text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <LogOut className="h-4 w-4 mr-2" />
@@ -477,18 +463,9 @@ export default function ProfilePage({
                         {activeTransactions.map((transaction) => {
                           const otherParty = transaction.otherParty;
                           const role = transaction.role;
-                          let hasUnread = false;
-                          try {
-                            const userStr = localStorage.getItem("user");
-                            if (userStr) {
-                              const currentUser = JSON.parse(userStr);
-                              hasUnread =
-                                transaction.latestMessage &&
-                                transaction.latestMessage.senderId !== currentUser?.id;
-                            }
-                          } catch {
-                            // Ignore parse errors
-                          }
+                          const hasUnread =
+                            transaction.latestMessage &&
+                            transaction.latestMessage.senderId !== currentUser?.id;
 
                           return (
                             <Link

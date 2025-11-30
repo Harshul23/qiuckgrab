@@ -2,18 +2,11 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button, Input, Badge, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel, Avatar, AvatarFallback } from "@/components/ui";
 import { ItemCardSkeleton } from "@/components/ui/item-card-skeleton";
 import { type Item } from "@/components/item-card";
 import { Search, Zap, Filter, Mic, User, LogOut, MapPin, Share2, ShoppingBag, Package, HelpCircle, Plus } from "lucide-react";
-
-interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-  photo: string | null;
-}
+import { useAuth } from "@/lib/auth-context";
 
 type TabType = "marketplace" | "lost-found";
 
@@ -23,7 +16,7 @@ const TABS: { id: TabType; label: string; icon: React.ReactNode; description: st
 ];
 
 export default function HomePage() {
-  const router = useRouter();
+  const { user: currentUser, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
@@ -32,29 +25,9 @@ export default function HomePage() {
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("marketplace");
   const observerTarget = useRef<HTMLDivElement>(null);
   const isSearchMode = useRef(false);
-
-  // Load user from localStorage on mount
-  useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        // Validate user object has required fields
-        if (user && typeof user.id === "string" && typeof user.name === "string") {
-          setCurrentUser(user);
-        } else {
-          setCurrentUser(null);
-        }
-      } catch {
-        // Invalid JSON in localStorage
-        setCurrentUser(null);
-      }
-    }
-  }, []);
 
   // Load cached items from sessionStorage on mount
   useEffect(() => {
@@ -134,15 +107,6 @@ export default function HomePage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleLogout = () => {
-    // Clear user session data from localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setCurrentUser(null);
-    // Redirect to signin page
-    router.push("/signin");
-  };
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -291,7 +255,7 @@ export default function HomePage() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                    <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>

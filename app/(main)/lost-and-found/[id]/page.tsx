@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Avatar, AvatarFallback } from "@/components/ui";
 import { ArrowLeft, MapPin, Calendar, Clock, Shield, Zap, CheckCircle, MessageCircle } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 interface LostFoundPostDetails {
   id: string;
@@ -33,25 +34,12 @@ interface LostFoundPostDetails {
 export default function LostFoundPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { user: currentUser, token, requireAuth } = useAuth();
   const [post, setPost] = useState<LostFoundPostDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
 
-  useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        setCurrentUserId(user?.id || null);
-      } catch {
-        // Invalid JSON
-      }
-    }
-    fetchPost();
-  }, [id]);
-
-  const fetchPost = async () => {
+  const fetchPost = useCallback(async () => {
     try {
       const res = await fetch(`/api/lost-found/${id}`);
       const data = await res.json();
@@ -61,12 +49,14 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchPost();
+  }, [fetchPost]);
 
   const handleMarkResolved = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/signin");
+    if (!requireAuth()) {
       return;
     }
 
@@ -100,9 +90,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
       return;
     }
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/signin");
+    if (!requireAuth()) {
       return;
     }
 
@@ -127,6 +115,9 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
       setUpdating(false);
     }
   };
+
+  // Check if viewing own post
+  const isOwner = currentUser?.id === post?.user?.id;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -166,8 +157,6 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
       </div>
     );
   }
-
-  const isOwner = currentUserId === post.user.id;
 
   return (
     <div className="min-h-screen bg-gray-50">
