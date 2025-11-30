@@ -315,18 +315,29 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8">
             {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? "border-orange-600 text-orange-600"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                {tab.icon}
-                <span className="font-medium">{tab.label}</span>
-              </button>
+              tab.id === "lost-found" ? (
+                <Link
+                  key={tab.id}
+                  href="/lost-and-found"
+                  className={`flex items-center space-x-2 py-4 border-b-2 transition-colors border-transparent text-gray-600 hover:text-gray-900`}
+                >
+                  {tab.icon}
+                  <span className="font-medium">{tab.label}</span>
+                </Link>
+              ) : (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? "border-orange-600 text-orange-600"
+                      : "border-transparent text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  {tab.icon}
+                  <span className="font-medium">{tab.label}</span>
+                </button>
+              )
             ))}
           </nav>
         </div>
