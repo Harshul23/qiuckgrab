@@ -43,7 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (storedToken && storedUser) {
           const parsedUser = JSON.parse(storedUser);
           // Validate user object has required fields
-          if (parsedUser && typeof parsedUser.id === "string" && typeof parsedUser.name === "string") {
+          if (
+            parsedUser &&
+            typeof parsedUser.id === "string" &&
+            typeof parsedUser.name === "string" &&
+            typeof parsedUser.email === "string"
+          ) {
             setToken(storedToken);
             setUser(parsedUser);
           } else {

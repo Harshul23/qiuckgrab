@@ -35,13 +35,6 @@ export default function ReportItemPage() {
     photo: "",
   });
 
-  // Redirect to signin if not authenticated
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      // Don't redirect, show sign-in prompt instead
-    }
-  }, [authLoading, isAuthenticated]);
-
   // Handle file selection and convert to data URL
   const handleFileSelect = useCallback((file: File | null) => {
     if (!file) {
