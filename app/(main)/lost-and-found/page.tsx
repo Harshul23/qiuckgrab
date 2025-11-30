@@ -129,7 +129,7 @@ export default function LostAndFoundPage() {
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just filter client-side. Could add search API later.
+    // Search is handled client-side by filtering posts, server-side search can be added later
     fetchPosts(1, false);
   }, [fetchPosts]);
 

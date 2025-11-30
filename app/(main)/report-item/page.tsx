@@ -58,7 +58,7 @@ export default function ReportItemPage() {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      window.location.href = "/signin";
+      router.push("/signin");
       return;
     }
 
