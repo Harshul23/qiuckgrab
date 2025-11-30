@@ -349,7 +349,6 @@ export default function HomePage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
               {activeTab === "marketplace" && "Campus Marketplace"}
-              {activeTab === "campus-relay" && "Campus Relay"}
               {activeTab === "lost-found" && "Lost & Found"}
             </h1>
             <p className="text-gray-600">{activeTabData?.description}</p>
