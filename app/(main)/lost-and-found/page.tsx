@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button, Input, Badge, Avatar, AvatarFallback, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui";
 import { Search, Zap, MapPin, Calendar, User, LogOut, Plus, Package, Filter, ShoppingBag, HelpCircle } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 interface LostFoundPost {
   id: string;
@@ -24,13 +24,6 @@ interface LostFoundPost {
     verificationStatus: string;
     college: string | null;
   };
-}
-
-interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-  photo: string | null;
 }
 
 type TabType = "marketplace" | "lost-found";
@@ -53,7 +46,7 @@ const CATEGORIES = [
 ];
 
 export default function LostAndFoundPage() {
-  const router = useRouter();
+  const { user: currentUser, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [posts, setPosts] = useState<LostFoundPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,23 +56,7 @@ export default function LostAndFoundPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeType, setActiveType] = useState<"ALL" | "LOST" | "FOUND">("ALL");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
-
-  // Load user from localStorage on mount
-  useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        if (user && typeof user.id === "string" && typeof user.name === "string") {
-          setCurrentUser(user);
-        }
-      } catch {
-        // Invalid JSON
-      }
-    }
-  }, []);
 
   // Fetch posts with pagination
   const fetchPosts = useCallback(async (pageNum: number = 1, append: boolean = false) => {
@@ -126,13 +103,6 @@ export default function LostAndFoundPage() {
   useEffect(() => {
     fetchPosts(1, false);
   }, [fetchPosts]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setCurrentUser(null);
-    router.push("/signin");
-  };
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -216,7 +186,7 @@ export default function LostAndFoundPage() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                    <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>

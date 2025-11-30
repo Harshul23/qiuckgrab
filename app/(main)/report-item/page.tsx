@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Textarea, FileUpload } from "@/components/ui";
 import { ArrowLeft, Zap, Tag, MapPin, Calendar, CheckCircle, Phone } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 const CATEGORIES = [
   "Electronics",
@@ -19,10 +20,10 @@ const CATEGORIES = [
 
 export default function ReportItemPage() {
   const router = useRouter();
+  const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [formData, setFormData] = useState({
     type: "LOST" as "LOST" | "FOUND",
     title: "",
@@ -33,16 +34,6 @@ export default function ReportItemPage() {
     contactInfo: "",
     photo: "",
   });
-
-  // Check authentication on mount
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setIsAuthenticated(false);
-    } else {
-      setIsAuthenticated(true);
-    }
-  }, []);
 
   // Handle file selection and convert to data URL
   const handleFileSelect = useCallback((file: File | null) => {
@@ -67,7 +58,6 @@ export default function ReportItemPage() {
     setError(null);
     setSuccess(false);
 
-    const token = localStorage.getItem("token");
     if (!token) {
       router.push("/signin");
       return;
@@ -114,7 +104,7 @@ export default function ReportItemPage() {
   };
 
   // Show loading while checking authentication
-  if (isAuthenticated === null) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
@@ -123,7 +113,7 @@ export default function ReportItemPage() {
   }
 
   // Show sign-in prompt if not authenticated
-  if (isAuthenticated === false) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Header */}

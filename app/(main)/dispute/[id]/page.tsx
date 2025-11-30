@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useCallback } from "react";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Textarea } from "@/components/ui";
 import { ArrowLeft, Zap, AlertTriangle, Upload, MessageCircle, CheckCircle, Clock } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 interface Dispute {
   id: string;
@@ -31,23 +32,14 @@ interface Dispute {
 
 export default function DisputePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { token, requireAuth } = useAuth();
   const [dispute, setDispute] = useState<Dispute | null>(null);
   const [loading, setLoading] = useState(true);
   const [evidenceText, setEvidenceText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [isNewDispute, setIsNewDispute] = useState(false);
 
-  useEffect(() => {
-    // Check if this is a transaction ID (new dispute) or dispute ID (existing)
-    if (id.startsWith("new-")) {
-      setIsNewDispute(true);
-      setLoading(false);
-    } else {
-      fetchDispute();
-    }
-  }, [id]);
-
-  const fetchDispute = async () => {
+  const fetchDispute = useCallback(async () => {
     // Mock data for demo
     setDispute({
       id: id,
@@ -66,7 +58,17 @@ export default function DisputePage({ params }: { params: Promise<{ id: string }
       },
     });
     setLoading(false);
-  };
+  }, [id]);
+
+  useEffect(() => {
+    // Check if this is a transaction ID (new dispute) or dispute ID (existing)
+    if (id.startsWith("new-")) {
+      setIsNewDispute(true);
+      setLoading(false);
+    } else {
+      fetchDispute();
+    }
+  }, [id, fetchDispute]);
 
   const handleSubmitDispute = async () => {
     if (!evidenceText.trim()) {
@@ -74,15 +76,13 @@ export default function DisputePage({ params }: { params: Promise<{ id: string }
       return;
     }
 
+    if (!requireAuth()) {
+      return;
+    }
+
     setSubmitting(true);
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "/signin";
-        return;
-      }
-
       const transactionId = id.replace("new-", "");
       const res = await fetch("/api/disputes", {
         method: "POST",

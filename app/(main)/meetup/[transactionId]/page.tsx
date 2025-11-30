@@ -3,7 +3,8 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
-import { ArrowLeft, Zap, MapPin, Clock, IndianRupee, CheckCircle, AlertTriangle, Navigation } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, IndianRupee, CheckCircle, AlertTriangle } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 interface MeetupLocation {
   name: string;
@@ -34,6 +35,7 @@ interface Transaction {
 
 export default function MeetupPage({ params }: { params: Promise<{ transactionId: string }> }) {
   const { transactionId } = use(params);
+  const { token, requireAuth } = useAuth();
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [suggestedLocations, setSuggestedLocations] = useState<MeetupLocation[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<MeetupLocation | null>(null);
@@ -116,15 +118,13 @@ export default function MeetupPage({ params }: { params: Promise<{ transactionId
       return;
     }
 
+    if (!requireAuth()) {
+      return;
+    }
+
     setPaying(true);
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "/signin";
-        return;
-      }
-
       // In real app, integrate with Razorpay
       const mockPaymentId = `pay_${Date.now()}`;
 
@@ -156,13 +156,11 @@ export default function MeetupPage({ params }: { params: Promise<{ transactionId
   };
 
   const handleConfirmReceipt = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "/signin";
-        return;
-      }
+    if (!requireAuth()) {
+      return;
+    }
 
+    try {
       const res = await fetch("/api/transactions/confirm", {
         method: "POST",
         headers: {

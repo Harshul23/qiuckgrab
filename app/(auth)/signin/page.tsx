@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, SplashAnimation } from "@/components/ui";
 import { Zap, Mail, Lock } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export default function SigninPage() {
+  const router = useRouter();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
@@ -23,6 +27,13 @@ export default function SigninPage() {
     }, 4000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Redirect to home if already authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push("/home");
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,14 +56,13 @@ export default function SigninPage() {
         throw new Error(data.error || "Login failed");
       }
 
-      // Store the token in localStorage
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+      // Store the token using auth context
+      if (data.token && data.user) {
+        login(data.token, data.user);
       }
 
       // Redirect to home page on success
-      window.location.href = "/home";
+      router.push("/home");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
