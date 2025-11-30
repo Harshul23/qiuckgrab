@@ -22,3 +22,4 @@ export {
   DropdownMenuLabel,
 } from "./dropdown-menu";
 export { MeetupModal } from "./meetup-modal";
+export { SplashAnimation } from "./splash-animation";

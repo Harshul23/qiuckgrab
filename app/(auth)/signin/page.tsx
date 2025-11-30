@@ -1,17 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
+import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, SplashAnimation } from "@/components/ui";
 import { Zap, Mail, Lock } from "lucide-react";
 
 export default function SigninPage() {
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  // Handle client-side mounting and splash timer
+  useEffect(() => {
+    setMounted(true);
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +59,30 @@ export default function SigninPage() {
       setLoading(false);
     }
   };
+
+  // Show splash animation when mounted and showSplash is true
+  if (mounted && showSplash) {
+    return (
+      <div 
+        className="cursor-pointer" 
+        onClick={() => setShowSplash(false)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && setShowSplash(false)}
+      >
+        <SplashAnimation />
+      </div>
+    );
+  }
+
+  // Show loading state before mounting to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">

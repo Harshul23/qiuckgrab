@@ -131,3 +131,50 @@ body {
 .ring-offset-background {
   --tw-ring-offset-color: hsl(var(--background));
 }
+
+/* Splash Animation Styles */
+@keyframes splash-bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-splash-bounce-in {
+  animation: splash-bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #4a4a4a 0%,
+    #4a4a4a 40%,
+    #a0a0a0 50%,
+    #4a4a4a 60%,
+    #4a4a4a 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
