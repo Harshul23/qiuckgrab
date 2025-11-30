@@ -4,39 +4,32 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Textarea, FileUpload } from "@/components/ui";
-import { ArrowLeft, Zap, IndianRupee, Tag, CheckCircle } from "lucide-react";
+import { ArrowLeft, Zap, Tag, MapPin, Calendar, CheckCircle, Phone } from "lucide-react";
 
 const CATEGORIES = [
   "Electronics",
   "Books",
-  "Furniture",
   "Clothing",
   "Accessories",
-  "Sports",
-  "Kitchen",
-  "Transportation",
+  "Keys",
+  "ID Cards",
+  "Bags",
   "Other",
 ];
 
-const CONDITIONS = [
-  { value: "NEW", label: "New" },
-  { value: "LIKE_NEW", label: "Like New" },
-  { value: "GOOD", label: "Good" },
-  { value: "FAIR", label: "Fair" },
-  { value: "POOR", label: "Poor" },
-];
-
-export default function ListItemPage() {
+export default function ReportItemPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: "",
+    type: "LOST" as "LOST" | "FOUND",
+    title: "",
     category: "",
     description: "",
-    price: "",
-    condition: "GOOD",
+    location: "",
+    date: "",
+    contactInfo: "",
     photo: "",
   });
 
@@ -65,7 +58,7 @@ export default function ListItemPage() {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      window.location.href = "/signin";
+      router.push("/signin");
       return;
     }
 
@@ -75,18 +68,20 @@ export default function ListItemPage() {
 
     // Send request in background
     try {
-      const res = await fetch("/api/items", {
+      const res = await fetch("/api/lost-found", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: formData.name,
+          type: formData.type,
+          title: formData.title,
           category: formData.category,
           description: formData.description || undefined,
-          price: parseFloat(formData.price),
-          condition: formData.condition,
+          location: formData.location || undefined,
+          date: formData.date || undefined,
+          contactInfo: formData.contactInfo || undefined,
           photo: formData.photo || undefined,
         }),
       });
@@ -94,19 +89,11 @@ export default function ListItemPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to list item");
+        throw new Error(data.error || "Failed to create post");
       }
 
-      // Clear cache to show new item in home page
-      try {
-        sessionStorage.removeItem("homeItems");
-        sessionStorage.removeItem("homePage");
-      } catch {
-        // Ignore storage errors
-      }
-
-      // Redirect to item page after successful creation
-      router.push(`/item/${data.item.id}`);
+      // Redirect to the post page after successful creation
+      router.push(`/lost-and-found/${data.post.id}`);
     } catch (err) {
       // Rollback optimistic state on error
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -120,7 +107,7 @@ export default function ListItemPage() {
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link href="/home" className="flex items-center text-gray-600 hover:text-gray-900">
+          <Link href="/lost-and-found" className="flex items-center text-gray-600 hover:text-gray-900">
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back
           </Link>
@@ -135,13 +122,13 @@ export default function ListItemPage() {
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">List an Item for Sale</CardTitle>
+            <CardTitle className="text-2xl">Report Lost or Found Item</CardTitle>
           </CardHeader>
           <CardContent>
             {success && !error && (
               <div className="bg-green-50 text-green-600 p-3 rounded-md mb-6 text-sm flex items-center">
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Item listed successfully! Redirecting...
+                Post created successfully! Redirecting...
               </div>
             )}
             {error && (
@@ -151,17 +138,50 @@ export default function ListItemPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Item Name */}
+              {/* Type Selection */}
               <div className="space-y-2">
-                <Label htmlFor="name">Item Name *</Label>
+                <Label>What would you like to report? *</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    className={`p-4 rounded-lg border-2 transition-colors ${
+                      formData.type === "LOST"
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                    onClick={() => setFormData({ ...formData, type: "LOST" })}
+                  >
+                    <div className="text-2xl mb-2">🔍</div>
+                    <div className="font-medium">I Lost Something</div>
+                    <div className="text-sm text-gray-500">Report an item you&apos;ve lost</div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`p-4 rounded-lg border-2 transition-colors ${
+                      formData.type === "FOUND"
+                        ? "border-green-500 bg-green-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                    onClick={() => setFormData({ ...formData, type: "FOUND" })}
+                  >
+                    <div className="text-2xl mb-2">✅</div>
+                    <div className="font-medium">I Found Something</div>
+                    <div className="text-sm text-gray-500">Report an item you&apos;ve found</div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Item Title */}
+              <div className="space-y-2">
+                <Label htmlFor="title">Item Name/Title *</Label>
                 <div className="relative">
                   <Tag className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
-                    id="name"
-                    placeholder="e.g., iPhone 13 Charger, TI-84 Calculator"
+                    id="title"
+                    placeholder="e.g., Blue Backpack, iPhone 14, Student ID Card"
                     className="pl-10"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     required
                   />
                 </div>
@@ -186,46 +206,37 @@ export default function ListItemPage() {
                 </select>
               </div>
 
-              {/* Price */}
+              {/* Location */}
               <div className="space-y-2">
-                <Label htmlFor="price">Price (₹) *</Label>
+                <Label htmlFor="location">
+                  {formData.type === "LOST" ? "Where did you lose it?" : "Where did you find it?"}
+                </Label>
                 <div className="relative">
-                  <IndianRupee className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
+                    id="location"
+                    placeholder="e.g., Library, Cafeteria, Room 301"
                     className="pl-10"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    required
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   />
                 </div>
-                <p className="text-xs text-gray-500">
-                  AI will analyze your price against campus averages
-                </p>
               </div>
 
-              {/* Condition */}
+              {/* Date */}
               <div className="space-y-2">
-                <Label htmlFor="condition">Condition *</Label>
-                <div className="grid grid-cols-5 gap-2">
-                  {CONDITIONS.map((cond) => (
-                    <button
-                      key={cond.value}
-                      type="button"
-                      className={`p-2 text-sm rounded-md border transition-colors ${
-                        formData.condition === cond.value
-                          ? "bg-orange-500 text-white border-orange-500"
-                          : "bg-white hover:bg-gray-50 border-gray-200"
-                      }`}
-                      onClick={() => setFormData({ ...formData, condition: cond.value })}
-                    >
-                      {cond.label}
-                    </button>
-                  ))}
+                <Label htmlFor="date">
+                  {formData.type === "LOST" ? "When did you lose it?" : "When did you find it?"}
+                </Label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="date"
+                    type="date"
+                    className="pl-10"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  />
                 </div>
               </div>
 
@@ -234,11 +245,29 @@ export default function ListItemPage() {
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
-                  placeholder="Describe your item (optional)"
+                  placeholder="Provide any additional details that might help identify the item..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
                 />
+              </div>
+
+              {/* Contact Info */}
+              <div className="space-y-2">
+                <Label htmlFor="contactInfo">Contact Information (optional)</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="contactInfo"
+                    placeholder="e.g., Phone number, WhatsApp, or email"
+                    className="pl-10"
+                    value={formData.contactInfo}
+                    onChange={(e) => setFormData({ ...formData, contactInfo: e.target.value })}
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  This will be visible to other users
+                </p>
               </div>
 
               {/* Photo Upload */}
@@ -249,14 +278,14 @@ export default function ListItemPage() {
                   maxSize={10}
                   onFileSelect={handleFileSelect}
                   placeholder="Click to upload or drag and drop"
-                  hint="PNG, JPG up to 10MB"
+                  hint="PNG, JPG up to 10MB - Adding a photo helps others identify the item"
                 />
               </div>
 
               {/* Submit */}
               <div className="pt-4">
                 <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                  {loading ? "Listing Item..." : "List Item for Sale"}
+                  {loading ? "Submitting..." : `Report ${formData.type === "LOST" ? "Lost" : "Found"} Item`}
                 </Button>
               </div>
             </form>
