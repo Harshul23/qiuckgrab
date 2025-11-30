@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Textarea, FileUpload } from "@/components/ui";
@@ -22,6 +22,7 @@ export default function ReportItemPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [formData, setFormData] = useState({
     type: "LOST" as "LOST" | "FOUND",
     title: "",
@@ -32,6 +33,16 @@ export default function ReportItemPage() {
     contactInfo: "",
     photo: "",
   });
+
+  // Check authentication on mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsAuthenticated(false);
+    } else {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   // Handle file selection and convert to data URL
   const handleFileSelect = useCallback((file: File | null) => {
@@ -102,18 +113,80 @@ export default function ReportItemPage() {
     }
   };
 
+  // Show loading while checking authentication
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      </div>
+    );
+  }
+
+  // Show sign-in prompt if not authenticated
+  if (isAuthenticated === false) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white border-b sticky top-0 z-50">
+          <div className="container mx-auto px-4 py-4 flex items-center">
+            <Link href="/lost-and-found" className="flex items-center text-gray-600 hover:text-orange-600">
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Back
+            </Link>
+            <div className="flex-1 flex items-center justify-center">
+              <Link href="/home" className="flex items-center space-x-2">
+                <div className="bg-orange-600 p-1.5 rounded-lg">
+                  <Zap className="h-5 w-5 text-white" />
+                </div>
+                <span className="font-bold text-gray-900">QuickGrab</span>
+              </Link>
+            </div>
+            <div className="w-20"></div>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-4 py-16 max-w-md text-center">
+          <div className="bg-white rounded-2xl shadow-sm border p-8">
+            <div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Zap className="h-8 w-8 text-orange-600" />
+            </div>
+            <h1 className="text-2xl font-bold mb-2">Sign In Required</h1>
+            <p className="text-gray-600 mb-6">
+              You need to sign in to report a lost or found item.
+            </p>
+            <Link href="/signin">
+              <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white">
+                Sign In to Continue
+              </Button>
+            </Link>
+            <p className="mt-4 text-sm text-gray-500">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="text-orange-600 hover:underline">
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link href="/lost-and-found" className="flex items-center text-gray-600 hover:text-gray-900">
+          <Link href="/lost-and-found" className="flex items-center text-gray-600 hover:text-orange-600">
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back
           </Link>
           <div className="flex-1 flex items-center justify-center">
-            <Zap className="h-6 w-6 text-orange-500 mr-2" />
-            <span className="font-bold">QuickGrab</span>
+            <Link href="/home" className="flex items-center space-x-2">
+              <div className="bg-orange-600 p-1.5 rounded-lg">
+                <Zap className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-gray-900">QuickGrab</span>
+            </Link>
           </div>
           <div className="w-20"></div>
         </div>
@@ -284,7 +357,7 @@ export default function ReportItemPage() {
 
               {/* Submit */}
               <div className="pt-4">
-                <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                <Button type="submit" size="lg" className="w-full bg-orange-600 hover:bg-orange-700" disabled={loading}>
                   {loading ? "Submitting..." : `Report ${formData.type === "LOST" ? "Lost" : "Found"} Item`}
                 </Button>
               </div>
