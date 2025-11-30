@@ -176,7 +176,7 @@ export default function LostAndFoundPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <Link href="/home" className="flex items-center space-x-2">
-              <Zap className="h-8 w-8 text-blue-600" />
+              <Zap className="h-8 w-8 text-orange-500" />
               <span className="text-2xl font-bold">QuickGrab</span>
             </Link>
             <div className="flex items-center space-x-4">
@@ -189,7 +189,7 @@ export default function LostAndFoundPage() {
               {currentUser ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full">
+                    <button className="focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-full">
                       <Avatar>
                         <AvatarFallback>{currentUser.name?.charAt(0) || "U"}</AvatarFallback>
                       </Avatar>
@@ -387,7 +387,7 @@ export default function LostAndFoundPage() {
                             <div className="flex items-center">
                               <span className="font-medium">{post.user.name}</span>
                               {post.user.verificationStatus === "VERIFIED" && (
-                                <span className="ml-1 text-blue-600">✓</span>
+                                <span className="ml-1 text-orange-500">✓</span>
                               )}
                             </div>
                             {post.user.college && (
@@ -407,7 +407,7 @@ export default function LostAndFoundPage() {
             {hasMore && (
               <div ref={observerTarget} className="h-10 flex items-center justify-center py-8">
                 {loadingMore && (
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
                 )}
               </div>
             )}

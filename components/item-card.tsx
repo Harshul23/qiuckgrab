@@ -61,7 +61,7 @@ const ItemCard = React.memo<ItemCardProps>(({ item, getPriceRatingColor }) => {
         <CardHeader className="pb-2">
           <div className="flex justify-between items-start">
             <CardTitle className="text-lg line-clamp-2">{item.name}</CardTitle>
-            <span className="text-xl font-bold text-blue-600">
+            <span className="text-xl font-bold text-orange-500">
               ₹{item.price.toFixed(2)}
             </span>
           </div>
@@ -86,7 +86,7 @@ const ItemCard = React.memo<ItemCardProps>(({ item, getPriceRatingColor }) => {
                 <div className="flex items-center">
                   <span className="font-medium">{item.seller.name}</span>
                   {item.seller.verificationStatus === "VERIFIED" && (
-                    <span className="ml-1 text-blue-600">✓</span>
+                    <span className="ml-1 text-orange-500">✓</span>
                   )}
                 </div>
                 <div className="flex items-center text-gray-500 text-xs">

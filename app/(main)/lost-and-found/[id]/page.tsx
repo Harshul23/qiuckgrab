@@ -149,7 +149,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
       </div>
     );
   }
@@ -179,7 +179,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
             Back
           </Link>
           <div className="flex-1 flex items-center justify-center">
-            <Zap className="h-6 w-6 text-blue-600 mr-2" />
+            <Zap className="h-6 w-6 text-orange-500 mr-2" />
             <span className="font-bold">QuickGrab</span>
           </div>
           <div className="w-20"></div>
@@ -282,11 +282,11 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
 
                 {/* Contact Info */}
                 {post.contactInfo && (
-                  <div className="bg-blue-50 rounded-2xl p-4 mb-4">
+                  <div className="bg-orange-50 rounded-2xl p-4 mb-4">
                     <div className="flex items-center text-sm">
-                      <MessageCircle className="h-5 w-5 mr-2 text-blue-600" />
+                      <MessageCircle className="h-5 w-5 mr-2 text-orange-500" />
                       <div>
-                        <span className="text-blue-600 font-medium">Contact Info:</span>
+                        <span className="text-orange-600 font-medium">Contact Info:</span>
                         <span className="ml-2">{post.contactInfo}</span>
                       </div>
                     </div>
@@ -383,7 +383,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Shield className="h-5 w-5 mr-2 text-blue-600" />
+                  <Shield className="h-5 w-5 mr-2 text-orange-500" />
                   Safety Tips
                 </CardTitle>
               </CardHeader>

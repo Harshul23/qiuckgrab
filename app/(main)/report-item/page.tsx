@@ -112,7 +112,7 @@ export default function ReportItemPage() {
             Back
           </Link>
           <div className="flex-1 flex items-center justify-center">
-            <Zap className="h-6 w-6 text-blue-600 mr-2" />
+            <Zap className="h-6 w-6 text-orange-500 mr-2" />
             <span className="font-bold">QuickGrab</span>
           </div>
           <div className="w-20"></div>

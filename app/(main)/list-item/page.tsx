@@ -125,7 +125,7 @@ export default function ListItemPage() {
             Back
           </Link>
           <div className="flex-1 flex items-center justify-center">
-            <Zap className="h-6 w-6 text-blue-600 mr-2" />
+            <Zap className="h-6 w-6 text-orange-500 mr-2" />
             <span className="font-bold">QuickGrab</span>
           </div>
           <div className="w-20"></div>
@@ -218,7 +218,7 @@ export default function ListItemPage() {
                       type="button"
                       className={`p-2 text-sm rounded-md border transition-colors ${
                         formData.condition === cond.value
-                          ? "bg-blue-600 text-white border-blue-600"
+                          ? "bg-orange-500 text-white border-orange-500"
                           : "bg-white hover:bg-gray-50 border-gray-200"
                       }`}
                       onClick={() => setFormData({ ...formData, condition: cond.value })}
