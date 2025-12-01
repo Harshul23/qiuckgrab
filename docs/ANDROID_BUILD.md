@@ -178,7 +178,7 @@ bubblewrap build --debug
 
 ## Additional Resources
 
-- [Bubblewrap Documentation](https://github.com/nicorighi/nicorighi.github.io/blob/main/nicorighi.github.io/bubblewrap.md)
+- [Bubblewrap GitHub Repository](https://github.com/GoogleChromeLabs/bubblewrap)
 - [Trusted Web Activities Overview](https://developer.chrome.com/docs/android/trusted-web-activity/)
 - [PWA Builder](https://www.pwabuilder.com/) - Alternative tool for generating Android wrappers
 - [Android Digital Asset Links](https://developers.google.com/digital-asset-links)

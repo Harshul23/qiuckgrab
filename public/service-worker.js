@@ -63,9 +63,13 @@ self.addEventListener('fetch', (event) => {
           // Clone the response for caching
           const responseToCache = response.clone();
 
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+          // Cache in the background - we don't need to wait for this
+          // as the response is already cloned
+          event.waitUntil(
+            caches.open(CACHE_NAME).then((cache) => {
+              return cache.put(event.request, responseToCache);
+            })
+          );
 
           return response;
         })
