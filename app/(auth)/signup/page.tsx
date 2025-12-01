@@ -11,7 +11,7 @@ type Step = "register" | "verify-email" | "verify-id";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const [step, setStep] = useState<Step>("register");
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -35,6 +35,13 @@ export default function SignupPage() {
     }, 4000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Redirect to home if already authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push("/home");
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
