@@ -108,9 +108,8 @@ export default function LostAndFoundPage() {
   }, [fetchPosts]);
 
   const handleLogout = () => {
+    // logout() handles the redirect
     logout();
-    // Redirect to home page after logout
-    router.replace("/home");
   };
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {

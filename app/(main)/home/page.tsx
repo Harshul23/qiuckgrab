@@ -112,10 +112,8 @@ export default function HomePage() {
   }, []);
 
   const handleLogout = () => {
-    // Use auth context logout function
+    // logout() handles the redirect
     logout();
-    // Redirect to home page after logout
-    router.replace("/home");
   };
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {

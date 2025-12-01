@@ -101,8 +101,8 @@ export default function ProfilePage({
   const isOwnProfile = currentUser?.id === id;
 
   const handleLogout = () => {
+    // logout() handles the redirect
     logout();
-    router.replace("/home");
   };
 
   // Fetch transactions when viewing own profile and chats tab is active
