@@ -359,15 +359,6 @@ export default function ChatPage({
   };
 
   const handleConfirmDelivery = async () => {
-    if (!currentUser) return;
-
-    setConfirmingDelivery(true);
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
-
     if (!currentUser || !token) return;
 
     setConfirmingDelivery(true);

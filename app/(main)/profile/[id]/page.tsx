@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -84,6 +85,7 @@ export default function ProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const router = useRouter();
   const { user: currentUser, token, logout } = useAuth();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [ratings, setRatings] = useState<Rating[]>([]);
@@ -97,6 +99,11 @@ export default function ProfilePage({
 
   // Check if viewing own profile
   const isOwnProfile = currentUser?.id === id;
+
+  const handleLogout = () => {
+    logout();
+    router.replace("/home");
+  };
 
   // Fetch transactions when viewing own profile and chats tab is active
   useEffect(() => {

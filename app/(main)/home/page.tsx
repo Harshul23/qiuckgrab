@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button, Input, Badge, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel, Avatar, AvatarFallback } from "@/components/ui";
 import { ItemCardSkeleton } from "@/components/ui/item-card-skeleton";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -17,6 +18,7 @@ const TABS: { id: TabType; label: string; icon: React.ReactNode; description: st
 ];
 
 export default function HomePage() {
+  const router = useRouter();
   const { user: currentUser, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [items, setItems] = useState<Item[]>([]);
@@ -110,10 +112,8 @@ export default function HomePage() {
   }, []);
 
   const handleLogout = () => {
-    // Clear user session data from localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setCurrentUser(null);
+    // Use auth context logout function
+    logout();
     // Redirect to home page after logout
     router.replace("/home");
   };

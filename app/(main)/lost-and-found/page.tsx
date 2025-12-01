@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button, Input, Badge, Avatar, AvatarFallback, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Search, Zap, MapPin, Calendar, User, LogOut, Plus, Package, Filter, ShoppingBag, HelpCircle } from "lucide-react";
@@ -47,6 +48,7 @@ const CATEGORIES = [
 ];
 
 export default function LostAndFoundPage() {
+  const router = useRouter();
   const { user: currentUser, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [posts, setPosts] = useState<LostFoundPost[]>([]);
@@ -106,9 +108,7 @@ export default function LostAndFoundPage() {
   }, [fetchPosts]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setCurrentUser(null);
+    logout();
     // Redirect to home page after logout
     router.replace("/home");
   };

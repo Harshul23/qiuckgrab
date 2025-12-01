@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, SplashAnimation } from "@/components/ui";
+import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, SplashAnimation, GoogleSignInButton } from "@/components/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useRouter } from "next/navigation";
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, SplashAnimation, GoogleSignInButton } from "@/components/ui";
 import { Zap, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+
+export const dynamic = "force-dynamic";
 
 export default function SigninPage() {
   const router = useRouter();
@@ -188,13 +189,12 @@ export default function SigninPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or continue with</span>
+              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
 
@@ -205,7 +205,7 @@ export default function SigninPage() {
             disabled={loading}
           />
 
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-orange-500 hover:underline">
               Sign up

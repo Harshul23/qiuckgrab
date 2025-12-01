@@ -17,9 +17,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
         <ThemeProvider defaultTheme="system" storageKey="quickgrab-theme">
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
-        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

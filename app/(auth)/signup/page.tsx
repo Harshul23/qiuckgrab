@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, FileUpload, SplashAnimation } from "@/components/ui";
+import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, FileUpload, SplashAnimation, GoogleSignInButton } from "@/components/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useRouter } from "next/navigation";
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, FileUpload, SplashAnimation, GoogleSignInButton } from "@/components/ui";
 import { Zap, Mail, Lock, User, GraduationCap } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+
+export const dynamic = "force-dynamic";
 
 type Step = "register" | "verify-email" | "verify-id";
 
