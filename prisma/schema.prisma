@@ -71,6 +71,7 @@ model User {
   name               String
   email              String              @unique
   password           String
+  googleId           String?             @unique
   college            String?
   photo              String?
   studentIdPhoto     String?

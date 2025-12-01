@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, FileUpload, SplashAnimation } from "@/components/ui";
+import { useRouter } from "next/navigation";
+import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, FileUpload, SplashAnimation, GoogleSignInButton } from "@/components/ui";
 import { Zap, Mail, Lock, User, GraduationCap } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 type Step = "register" | "verify-email" | "verify-id";
 
 export default function SignupPage() {
+  const router = useRouter();
+  const { login } = useAuth();
   const [step, setStep] = useState<Step>("register");
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -129,6 +133,47 @@ export default function SignupPage() {
     }
   };
 
+  const handleGoogleSuccess = async (credential: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Google sign-up failed");
+      }
+
+      // Store the token using auth context
+      if (data.token && data.user) {
+        login(data.token, data.user);
+      }
+
+      // If this is a new user, go to ID verification step
+      if (data.isNewUser) {
+        setUserId(data.user.id);
+        setStep("verify-id");
+      } else {
+        // Existing user, redirect to home
+        router.push("/home");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Google sign-up failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = (error: string) => {
+    setError(error);
+  };
+
   // Show splash animation when mounted and showSplash is true
   if (mounted && showSplash) {
     return (
@@ -242,6 +287,22 @@ export default function SignupPage() {
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Creating Account..." : "Create Account"}
               </Button>
+
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                </div>
+              </div>
+
+              <GoogleSignInButton
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                text="signup"
+                disabled={loading}
+              />
             </form>
           )}
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, SplashAnimation } from "@/components/ui";
+import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, SplashAnimation, GoogleSignInButton } from "@/components/ui";
 import { Zap, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -68,6 +68,41 @@ export default function SigninPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (credential: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Google sign-in failed");
+      }
+
+      // Store the token using auth context
+      if (data.token && data.user) {
+        login(data.token, data.user);
+      }
+
+      // Redirect to home page on success
+      router.push("/home");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Google sign-in failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = (error: string) => {
+    setError(error);
   };
 
   // Show splash animation when mounted and showSplash is true
@@ -147,6 +182,22 @@ export default function SigninPage() {
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-500">Or continue with</span>
+            </div>
+          </div>
+
+          <GoogleSignInButton
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            text="signin"
+            disabled={loading}
+          />
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Don&apos;t have an account?{" "}
