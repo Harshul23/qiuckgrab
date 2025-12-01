@@ -1,0 +1,72 @@
+{
+  "name": "QuickGrab",
+  "shortName": "QuickGrab",
+  "packageId": "app.quickgrab.pwa",
+  "host": "https://your-production-domain.com",
+  "startUrl": "/",
+  "display": "standalone",
+  "themeColor": "#0ea5e9",
+  "backgroundColor": "#ffffff",
+  "navigationColor": "#0ea5e9",
+  "navigationColorDark": "#0284c7",
+  "navigationDividerColor": "#0ea5e9",
+  "navigationDividerColorDark": "#0284c7",
+  "iconUrl": "https://your-production-domain.com/icons/icon-512.png",
+  "maskableIconUrl": "https://your-production-domain.com/icons/icon-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "enableNotifications": true,
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "launcherName": "QuickGrab",
+  "fallbackType": "customtabs",
+  "appVersion": "1.0.0",
+  "appVersionCode": 1,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "quickgrab"
+  },
+  "shortcuts": [
+    {
+      "name": "Home",
+      "shortName": "Home",
+      "url": "/home",
+      "chosenIconUrl": "https://your-production-domain.com/icons/icon-192.png"
+    },
+    {
+      "name": "My Profile",
+      "shortName": "Profile",
+      "url": "/profile",
+      "chosenIconUrl": "https://your-production-domain.com/icons/icon-192.png"
+    }
+  ],
+  "generatorApp": "cli",
+  "webManifestUrl": "https://your-production-domain.com/manifest.json",
+  "orientation": "portrait",
+  "fingerprints": [
+    {
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.quickgrab.pwa",
+        "sha256_cert_fingerprints": [
+          "YOUR_SHA256_CERT_FINGERPRINT_HERE"
+        ]
+      }
+    }
+  ],
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableGooglePlayBilling": false,
+  "serviceAccountJsonFile": null,
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [1]
+}
