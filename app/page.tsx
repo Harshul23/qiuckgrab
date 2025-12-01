@@ -35,7 +35,7 @@ const PHONE_CATEGORIES = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50/80 to-background dark:from-orange-950/20 dark:to-background">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -61,9 +61,9 @@ export default function LandingPage() {
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           {/* Left Side - Text Content */}
           <div className="flex-1 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-card border rounded-full px-4 py-2 mb-6 shadow-sm">
+            <div className="inline-flex items-center gap-2 bg-orange-50 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800 rounded-full px-4 py-2 mb-6 shadow-sm">
               <Shield className="h-4 w-4 text-orange-600" />
-              <span className="text-sm font-semibold text-foreground tracking-wide">VERIFIED STUDENTS ONLY</span>
+              <span className="text-sm font-semibold text-orange-700 dark:text-orange-300 tracking-wide">VERIFIED STUDENTS ONLY</span>
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
@@ -99,7 +99,7 @@ export default function LandingPage() {
       </section>
 
       {/* Why QuickGrab Section */}
-      <section className="container mx-auto px-4 py-16 lg:py-24 bg-orange-50/50 dark:bg-orange-950/20 rounded-3xl">
+      <section className="container mx-auto px-4 py-16 lg:py-24 bg-secondary/50 dark:bg-secondary/30 rounded-3xl">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-6">Why QuickGrab?</h2>
           <p className="text-center text-muted-foreground text-lg md:text-xl max-w-3xl mx-auto mb-16 leading-relaxed">

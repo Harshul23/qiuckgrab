@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Avatar, AvatarFallback } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ArrowLeft, MapPin, Calendar, Clock, Shield, Zap, CheckCircle, MessageCircle } from "lucide-react";
 
 interface LostFoundPostDetails {
@@ -148,17 +149,17 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Post Not Found</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Post Not Found</h1>
           <Link href="/lost-and-found">
             <Button className="bg-orange-600 hover:bg-orange-700">Back to Lost & Found</Button>
           </Link>
@@ -170,11 +171,11 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
   const isOwner = currentUserId === post.user.id;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
+      <header className="bg-card border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link href="/lost-and-found" className="flex items-center text-gray-600 hover:text-orange-600">
+          <Link href="/lost-and-found" className="flex items-center text-muted-foreground hover:text-orange-600">
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back
           </Link>
@@ -183,10 +184,10 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
               <div className="bg-orange-600 p-1.5 rounded-lg">
                 <Zap className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold text-gray-900">QuickGrab</span>
+              <span className="font-bold text-foreground">QuickGrab</span>
             </Link>
           </div>
-          <div className="w-20"></div>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -195,11 +196,11 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
           {/* Left: Image & Description */}
           <div className="space-y-6">
             {/* Main Image */}
-            <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden relative">
+            <div className="aspect-square bg-muted rounded-2xl overflow-hidden relative">
               {post.photo ? (
                 <img src={post.photo} alt={post.title} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                   No Image Available
                 </div>
               )}
@@ -221,7 +222,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
             {post.photos.length > 0 && (
               <div className="flex gap-2 overflow-x-auto">
                 {post.photos.map((photo, i) => (
-                  <div key={i} className="w-20 h-20 bg-gray-100 rounded-2xl overflow-hidden flex-shrink-0">
+                  <div key={i} className="w-20 h-20 bg-muted rounded-2xl overflow-hidden flex-shrink-0">
                     <img src={photo} alt={`${post.title} ${i + 1}`} className="w-full h-full object-cover" />
                   </div>
                 ))}
@@ -234,7 +235,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
                 <CardTitle>Description</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   {post.description || "No description provided."}
                 </p>
               </CardContent>
@@ -246,7 +247,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
             {/* Title & Details */}
             <Card>
               <CardContent className="pt-6">
-                <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
+                <h1 className="text-2xl font-bold text-foreground mb-4">{post.title}</h1>
                 
                 <div className="flex gap-2 mb-4">
                   <Badge variant="outline">{post.category}</Badge>
@@ -256,42 +257,42 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
                 </div>
 
                 {/* Location & Date Info */}
-                <div className="bg-gray-50 rounded-2xl p-4 mb-4 space-y-3">
+                <div className="bg-muted rounded-2xl p-4 mb-4 space-y-3">
                   {post.location && (
                     <div className="flex items-center text-sm">
-                      <MapPin className="h-5 w-5 mr-2 text-gray-500" />
+                      <MapPin className="h-5 w-5 mr-2 text-muted-foreground" />
                       <div>
-                        <span className="text-gray-600">{post.type === "LOST" ? "Last seen at:" : "Found at:"}</span>
-                        <span className="font-medium ml-2">{post.location}</span>
+                        <span className="text-muted-foreground">{post.type === "LOST" ? "Last seen at:" : "Found at:"}</span>
+                        <span className="font-medium text-foreground ml-2">{post.location}</span>
                       </div>
                     </div>
                   )}
                   {post.date && (
                     <div className="flex items-center text-sm">
-                      <Calendar className="h-5 w-5 mr-2 text-gray-500" />
+                      <Calendar className="h-5 w-5 mr-2 text-muted-foreground" />
                       <div>
-                        <span className="text-gray-600">{post.type === "LOST" ? "Lost on:" : "Found on:"}</span>
-                        <span className="font-medium ml-2">{formatDate(post.date)}</span>
+                        <span className="text-muted-foreground">{post.type === "LOST" ? "Lost on:" : "Found on:"}</span>
+                        <span className="font-medium text-foreground ml-2">{formatDate(post.date)}</span>
                       </div>
                     </div>
                   )}
                   <div className="flex items-center text-sm">
-                    <Clock className="h-5 w-5 mr-2 text-gray-500" />
+                    <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
                     <div>
-                      <span className="text-gray-600">Posted:</span>
-                      <span className="font-medium ml-2">{formatDate(post.createdAt)} at {formatTime(post.createdAt)}</span>
+                      <span className="text-muted-foreground">Posted:</span>
+                      <span className="font-medium text-foreground ml-2">{formatDate(post.createdAt)} at {formatTime(post.createdAt)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Contact Info */}
                 {post.contactInfo && (
-                  <div className="bg-orange-50 rounded-2xl p-4 mb-4">
+                  <div className="bg-orange-500/10 rounded-2xl p-4 mb-4">
                     <div className="flex items-center text-sm">
                       <MessageCircle className="h-5 w-5 mr-2 text-orange-500" />
                       <div>
-                        <span className="text-orange-600 font-medium">Contact Info:</span>
-                        <span className="ml-2">{post.contactInfo}</span>
+                        <span className="text-orange-600 dark:text-orange-400 font-medium">Contact Info:</span>
+                        <span className="text-foreground ml-2">{post.contactInfo}</span>
                       </div>
                     </div>
                   </div>
@@ -310,7 +311,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
                     </Button>
                     <Button
                       variant="outline"
-                      className="text-red-600 hover:bg-red-50"
+                      className="text-destructive hover:bg-destructive/10"
                       onClick={handleDelete}
                       disabled={updating}
                     >
@@ -322,7 +323,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
                 {/* Non-owner CTA */}
                 {!isOwner && post.status === "ACTIVE" && (
                   <div className="text-center py-4">
-                    <p className="text-gray-600 mb-2">
+                    <p className="text-muted-foreground mb-2">
                       {post.type === "LOST" 
                         ? "If you've found this item, contact the owner!"
                         : "If this is your item, contact the finder!"}
@@ -345,15 +346,15 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
               </CardHeader>
               <CardContent>
                 <Link href={`/profile/${post.user.id}`}>
-                  <div className="flex items-center space-x-4 hover:bg-gray-50 p-2 rounded-2xl -m-2">
+                  <div className="flex items-center space-x-4 hover:bg-accent p-2 rounded-2xl -m-2 transition-colors">
                     <Avatar className="h-16 w-16">
-                      <AvatarFallback className="text-lg bg-orange-100 text-orange-600">
+                      <AvatarFallback className="text-lg bg-orange-500/20 text-orange-600">
                         {post.user.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center">
-                        <span className="font-semibold text-lg">{post.user.name}</span>
+                        <span className="font-semibold text-lg text-foreground">{post.user.name}</span>
                         {post.user.verificationStatus === "VERIFIED" && (
                           <Badge variant="verified" className="ml-2">
                             <Shield className="h-3 w-3 mr-1" />
@@ -362,17 +363,17 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
                         )}
                       </div>
                       {post.user.college && (
-                        <p className="text-sm text-gray-500">{post.user.college}</p>
+                        <p className="text-sm text-muted-foreground">{post.user.college}</p>
                       )}
                     </div>
                     <div className="text-right">
                       {post.user.isOnline ? (
-                        <span className="flex items-center text-green-600 text-sm">
+                        <span className="flex items-center text-green-600 dark:text-green-500 text-sm">
                           <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
                           Online
                         </span>
                       ) : (
-                        <span className="flex items-center text-gray-400 text-sm">
+                        <span className="flex items-center text-muted-foreground text-sm">
                           <Clock className="h-4 w-4 mr-1" />
                           Offline
                         </span>
@@ -392,7 +393,7 @@ export default function LostFoundPostPage({ params }: { params: Promise<{ id: st
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start">
                     <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                     Meet in a public, well-lit campus location
