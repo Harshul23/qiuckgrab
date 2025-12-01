@@ -23,6 +23,25 @@ export const verifyIdSchema = z.object({
   idPhotoUrl: z.string().url("Invalid photo URL"),
 });
 
+// Student email domains allowed (student emails for .edu and .org)
+const studentEmailRegex = /\.(edu|org)$/i;
+
+export const googleAuthSchema = z.object({
+  credential: z.string().min(1, "Google credential is required"),
+});
+
+/**
+ * Validates if an email is a valid student email
+ * Accepts .edu and .org domain emails
+ */
+export function isStudentEmail(email: string): boolean {
+  const domain = email.split("@")[1];
+  if (!domain) return false;
+  return studentEmailRegex.test(domain);
+}
+
+export type GoogleAuthInput = z.infer<typeof googleAuthSchema>;
+
 // Custom validator for URLs or image data URLs
 const urlOrDataUrl = z.string().refine(
   (val) => {

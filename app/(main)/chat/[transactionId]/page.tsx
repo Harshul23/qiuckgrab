@@ -18,6 +18,7 @@ import {
   MapPin,
   HandCoins,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 interface Message {
   id: string;
@@ -52,18 +53,13 @@ interface Transaction {
   messages?: Message[];
 }
 
-interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-}
-
 export default function ChatPage({
   params,
 }: {
   params: Promise<{ transactionId: string }>;
 }) {
   const { transactionId } = use(params);
+  const { user: currentUser, token } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [transaction, setTransaction] = useState<Transaction | null>(null);
@@ -75,33 +71,15 @@ export default function ChatPage({
   const [confirmingDelivery, setConfirmingDelivery] = useState(false);
   const [showMeetupModal, setShowMeetupModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  // Load current user from localStorage
-  useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        if (user && typeof user.id === "string") {
-          setCurrentUser(user);
-        }
-      } catch (err) {
-        // Invalid JSON in localStorage, clear corrupted data
-        localStorage.removeItem("user");
-      }
-    }
-  }, []);
-
   // Fetch transaction data
   const fetchTransaction = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
       if (!token) {
         setError("Please sign in to view this transaction");
         setLoading(false);
@@ -133,11 +111,11 @@ export default function ChatPage({
         );
       }
       setLoading(false);
-    } catch (err) {
+    } catch {
       setError("Something went wrong");
       setLoading(false);
     }
-  }, [transactionId]);
+  }, [transactionId, token]);
 
   useEffect(() => {
     fetchTransaction();
@@ -150,24 +128,12 @@ export default function ChatPage({
 
   // Poll for new messages every 2 seconds when page is visible
   useEffect(() => {
-    if (loading || !transaction) return;
+    if (loading || !transaction || !token) return;
 
-    let intervalId: NodeJS.Timeout;
-    let isPageVisible = true;
-
-    const handleVisibilityChange = () => {
-      isPageVisible = !document.hidden;
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    const pollMessages = async () => {
-      if (!isPageVisible) return;
+    const intervalId = setInterval(async () => {
+      if (document.hidden) return;
 
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
         const res = await fetch(`/api/transactions/${transactionId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -197,19 +163,15 @@ export default function ChatPage({
             return hasChanges ? newMessages : prev;
           });
         }
-      } catch (err) {
+      } catch {
         // Silently fail polling errors
       }
-    };
-
-    // Poll every 2 seconds
-    intervalId = setInterval(pollMessages, 2000);
+    }, 2000);
 
     return () => {
       clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [transactionId, loading, transaction]);
+  }, [transactionId, loading, transaction, token]);
 
   useEffect(() => {
     scrollToBottom();
@@ -217,7 +179,7 @@ export default function ChatPage({
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !currentUser) return;
+    if (!newMessage.trim() || !currentUser || !token) return;
 
     setSending(true);
     const messageContent = newMessage;
@@ -233,11 +195,6 @@ export default function ChatPage({
     setMessages((prev) => [...prev, tempMessage]);
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
-
       const res = await fetch(`/api/transactions/${transactionId}/messages`, {
         method: "POST",
         headers: {
@@ -279,15 +236,10 @@ export default function ChatPage({
   };
 
   const handleAccept = async () => {
-    if (!currentUser) return;
+    if (!currentUser || !token) return;
 
     setAccepting(true);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
-
       const res = await fetch("/api/transactions/accept", {
         method: "POST",
         headers: {
@@ -315,12 +267,11 @@ export default function ChatPage({
   };
 
   const handleSetMeetup = async (location: string) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
+    if (!token) {
+      throw new Error("Not authenticated");
+    }
 
+    try {
       const res = await fetch(`/api/transactions/${transactionId}/meetup`, {
         method: "POST",
         headers: {
@@ -344,15 +295,10 @@ export default function ChatPage({
   };
 
   const handleMarkPaid = async () => {
-    if (!currentUser) return;
+    if (!currentUser || !token) return;
 
     setMarkingPaid(true);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
-
       const res = await fetch(`/api/transactions/${transactionId}/mark-paid`, {
         method: "POST",
         headers: {
@@ -378,15 +324,10 @@ export default function ChatPage({
   };
 
   const handleMarkReceived = async () => {
-    if (!currentUser) return;
+    if (!currentUser || !token) return;
 
     setMarkingReceived(true);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
-
       const res = await fetch(
         `/api/transactions/${transactionId}/mark-received`,
         {
@@ -427,6 +368,10 @@ export default function ChatPage({
         throw new Error("Not authenticated");
       }
 
+    if (!currentUser || !token) return;
+
+    setConfirmingDelivery(true);
+    try {
       const res = await fetch(
         `/api/transactions/${transactionId}/confirm-delivery`,
         {
@@ -447,7 +392,7 @@ export default function ChatPage({
 
       // Refresh transaction data
       await fetchTransaction();
-      alert("Delivery confirmed!");
+      alert("Delivery confirmed! Waiting for buyer to confirm receipt.");
     } catch (err) {
       alert(
         err instanceof Error ? err.message : "Failed to confirm delivery"
