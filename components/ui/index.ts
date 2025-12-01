@@ -23,3 +23,4 @@ export {
 } from "./dropdown-menu";
 export { MeetupModal } from "./meetup-modal";
 export { SplashAnimation } from "./splash-animation";
+export { GoogleSignInButton } from "./google-signin-button";
