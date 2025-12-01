@@ -87,13 +87,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [router]);
 
   // Check if user is authenticated and redirect if not
+  // Returns true if authenticated, false if not (and redirects to signin)
+  // If still loading, returns true to prevent premature redirects
   const requireAuth = useCallback((): boolean => {
+    // If still loading auth state, don't redirect yet - assume authenticated
+    if (isLoading) {
+      return true;
+    }
     if (!token) {
       router.push("/signin");
       return false;
     }
     return true;
-  }, [token, router]);
+  }, [token, isLoading, router]);
 
   const isAuthenticated = !!token && !!user;
 
