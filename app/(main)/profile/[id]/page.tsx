@@ -13,6 +13,7 @@ import {
   AvatarFallback,
   Button,
 } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   ArrowLeft,
   Zap,
@@ -177,18 +178,18 @@ export default function ProfilePage({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <Link href="/home" className="text-blue-600 hover:underline">
+          <p className="text-destructive mb-4">{error}</p>
+          <Link href="/home" className="text-orange-500 hover:underline">
             Go back to home
           </Link>
         </div>
@@ -198,8 +199,8 @@ export default function ProfilePage({
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>User not found</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-foreground">User not found</p>
       </div>
     );
   }
@@ -207,30 +208,31 @@ export default function ProfilePage({
   const trustLevel = getTrustLevel(user.trustScore);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
+      <header className="bg-card border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link href="/home" className="text-gray-600 hover:text-gray-900">
+          <Link href="/home" className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex-1 flex items-center justify-center">
-            <Zap className="h-6 w-6 text-blue-600 mr-2" />
-            <span className="font-bold">QuickGrab</span>
+            <Zap className="h-6 w-6 text-orange-500 mr-2" />
+            <span className="font-bold text-foreground">QuickGrab</span>
           </div>
-          {isOwnProfile ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
-          ) : (
-            <div className="w-5"></div>
-          )}
+          <div className="flex items-center space-x-2">
+            <ThemeToggle />
+            {isOwnProfile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-destructive hover:text-destructive"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -240,13 +242,13 @@ export default function ProfilePage({
           <CardContent className="pt-6">
             <div className="flex items-start space-x-6">
               <Avatar className="h-24 w-24">
-                <AvatarFallback className="text-3xl">
+                <AvatarFallback className="text-3xl bg-orange-500/20 text-orange-500">
                   {user.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center mb-2">
-                  <h1 className="text-2xl font-bold mr-3">{user.name}</h1>
+                  <h1 className="text-2xl font-bold text-foreground mr-3">{user.name}</h1>
                   {user.verificationStatus === "VERIFIED" && (
                     <Badge variant="verified">
                       <Shield className="h-3 w-3 mr-1" />
@@ -255,27 +257,27 @@ export default function ProfilePage({
                   )}
                 </div>
                 {user.college && (
-                  <p className="text-gray-600 mb-3">{user.college}</p>
+                  <p className="text-muted-foreground mb-3">{user.college}</p>
                 )}
 
                 {/* Stats */}
                 <div className="flex items-center space-x-6 text-sm">
-                  <div className="flex items-center">
+                  <div className="flex items-center text-foreground">
                     <Star className="h-5 w-5 fill-yellow-400 text-yellow-400 mr-1" />
                     <span className="font-semibold">
                       {user.avgRating.toFixed(1)}
                     </span>
-                    <span className="text-gray-500 ml-1">
+                    <span className="text-muted-foreground ml-1">
                       ({ratings.length} reviews)
                     </span>
                   </div>
-                  <div>
+                  <div className="text-foreground">
                     <span className="font-semibold">{user.completedDeals}</span>
-                    <span className="text-gray-500 ml-1">deals</span>
+                    <span className="text-muted-foreground ml-1">deals</span>
                   </div>
                   <div className={trustLevel.color}>
                     <span className="font-semibold">{user.trustScore}</span>
-                    <span className="text-gray-500 ml-1">trust score</span>
+                    <span className="text-muted-foreground ml-1">trust score</span>
                   </div>
                 </div>
 
@@ -307,48 +309,48 @@ export default function ProfilePage({
               <Badge className={trustLevel.color}>{trustLevel.level}</Badge>
             </div>
             <div className="space-y-3">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-foreground">
                 <span>Verification</span>
                 <span className="font-medium">20/20</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div
                   className="bg-green-500 h-2 rounded-full"
                   style={{ width: "100%" }}
                 ></div>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-foreground">
                 <span>Ratings</span>
                 <span className="font-medium">
                   {Math.round((user.avgRating / 5) * 40)}/40
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div
                   className="bg-blue-500 h-2 rounded-full"
                   style={{ width: `${(user.avgRating / 5) * 100}%` }}
                 ></div>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-foreground">
                 <span>Deal Volume</span>
                 <span className="font-medium">
                   {Math.min(20, Math.round((user.completedDeals / 100) * 20))}
                   /20
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div
                   className="bg-purple-500 h-2 rounded-full"
                   style={{ width: `${Math.min(100, user.completedDeals)}%` }}
                 ></div>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-foreground">
                 <span>Reliability</span>
                 <span className="font-medium">
                   {Math.round((1 - user.cancellationRate) * 20)}/20
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div
                   className="bg-yellow-500 h-2 rounded-full"
                   style={{ width: `${(1 - user.cancellationRate) * 100}%` }}
@@ -363,8 +365,8 @@ export default function ProfilePage({
           <button
             className={`px-4 py-2 font-medium ${
               activeTab === "listings"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-500"
+                ? "text-orange-500 border-b-2 border-orange-500"
+                : "text-muted-foreground"
             }`}
             onClick={() => setActiveTab("listings")}
           >
@@ -375,8 +377,8 @@ export default function ProfilePage({
             <button
               className={`px-4 py-2 font-medium ${
                 activeTab === "chats"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-500"
+                  ? "text-orange-500 border-b-2 border-orange-500"
+                  : "text-muted-foreground"
               }`}
               onClick={() => setActiveTab("chats")}
             >
@@ -387,8 +389,8 @@ export default function ProfilePage({
           <button
             className={`px-4 py-2 font-medium ${
               activeTab === "reviews"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-500"
+                ? "text-orange-500 border-b-2 border-orange-500"
+                : "text-muted-foreground"
             }`}
             onClick={() => setActiveTab("reviews")}
           >
@@ -401,7 +403,7 @@ export default function ProfilePage({
         {activeTab === "listings" && (
           <div className="grid gap-4">
             {items.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">
+              <p className="text-center text-muted-foreground py-8">
                 No active listings
               </p>
             ) : (
@@ -410,7 +412,7 @@ export default function ProfilePage({
                   <Card className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center">
+                        <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center">
                           {item.photo ? (
                             <img
                               src={item.photo}
@@ -418,25 +420,25 @@ export default function ProfilePage({
                               className="w-full h-full object-cover rounded-2xl"
                             />
                           ) : (
-                            <Package className="h-8 w-8 text-gray-400" />
+                            <Package className="h-8 w-8 text-muted-foreground" />
                           )}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold">{item.name}</h3>
-                          <div className="flex items-center space-x-2 text-sm text-gray-500">
+                          <h3 className="font-semibold text-foreground">{item.name}</h3>
+                          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                             <Badge variant="outline">{item.condition}</Badge>
                             <Badge
                               className={
                                 item.availabilityStatus === "AVAILABLE"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-gray-100 text-gray-800"
+                                  ? "bg-green-500/20 text-green-500"
+                                  : "bg-muted text-muted-foreground"
                               }
                             >
                               {item.availabilityStatus}
                             </Badge>
                           </div>
                         </div>
-                        <span className="text-xl font-bold text-blue-600">
+                        <span className="text-xl font-bold text-orange-500">
                           ₹{item.price.toFixed(2)}
                         </span>
                       </div>
@@ -451,7 +453,7 @@ export default function ProfilePage({
         {activeTab === "chats" && isOwnProfile && (
           <div className="space-y-6">
             {transactions.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No active chats</p>
+              <p className="text-center text-muted-foreground py-8">No active chats</p>
             ) : (
               (() => {
                 const activeStatuses = [
@@ -471,7 +473,7 @@ export default function ProfilePage({
                   <>
                     {activeTransactions.length > 0 && (
                       <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-800">
+                        <h3 className="text-lg font-semibold text-foreground">
                           Active Chats ({activeTransactions.length})
                         </h3>
                         {activeTransactions.map((transaction) => {
@@ -500,18 +502,18 @@ export default function ProfilePage({
                                   <div className="flex items-start space-x-4">
                                     <div className="relative">
                                       <Avatar>
-                                        <AvatarFallback>
+                                        <AvatarFallback className="bg-orange-500/20 text-orange-500">
                                           {otherParty.name.charAt(0)}
                                         </AvatarFallback>
                                       </Avatar>
                                       {hasUnread && (
-                                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-blue-600 rounded-full border-2 border-white"></div>
+                                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-orange-500 rounded-full border-2 border-card"></div>
                                       )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center justify-between mb-1">
                                         <span
-                                          className={`font-medium ${
+                                          className={`font-medium text-foreground ${
                                             hasUnread ? "font-semibold" : ""
                                           }`}
                                         >
@@ -528,22 +530,22 @@ export default function ProfilePage({
                                           {transaction.status}
                                         </Badge>
                                       </div>
-                                      <div className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+                                      <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
                                         <span
                                           className={
                                             role === "buyer"
-                                              ? "text-blue-600"
-                                              : "text-green-600"
+                                              ? "text-blue-500"
+                                              : "text-green-500"
                                           }
                                         >
                                           {role === "buyer" ? "Buying" : "Selling"}
                                         </span>
                                         <span>•</span>
-                                        <span className="font-medium">
+                                        <span className="font-medium text-foreground">
                                           {transaction.item.name}
                                         </span>
                                         <span>•</span>
-                                        <span className="text-blue-600 font-semibold">
+                                        <span className="text-orange-500 font-semibold">
                                           ₹{transaction.escrowAmount.toFixed(2)}
                                         </span>
                                       </div>
@@ -551,8 +553,8 @@ export default function ProfilePage({
                                         <p
                                           className={`text-sm truncate ${
                                             hasUnread
-                                              ? "text-gray-900 font-medium"
-                                              : "text-gray-600"
+                                              ? "text-foreground font-medium"
+                                              : "text-muted-foreground"
                                           }`}
                                         >
                                           {transaction.latestMessage.senderName}:{" "}
@@ -560,7 +562,7 @@ export default function ProfilePage({
                                         </p>
                                       )}
                                       {transaction.meetupLocation && (
-                                        <div className="flex items-center text-xs text-gray-500 mt-2">
+                                        <div className="flex items-center text-xs text-muted-foreground mt-2">
                                           <MessageCircle className="h-3 w-3 mr-1" />
                                           Meet at: {transaction.meetupLocation}
                                         </div>
@@ -576,7 +578,7 @@ export default function ProfilePage({
                     )}
                     {completedTransactions.length > 0 && (
                       <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-800">
+                        <h3 className="text-lg font-semibold text-foreground">
                           Completed ({completedTransactions.length})
                         </h3>
                         {completedTransactions.map((transaction) => {
@@ -592,40 +594,40 @@ export default function ProfilePage({
                                 <CardContent className="p-4">
                                   <div className="flex items-start space-x-4">
                                     <Avatar>
-                                      <AvatarFallback>
+                                      <AvatarFallback className="bg-orange-500/20 text-orange-500">
                                         {otherParty.name.charAt(0)}
                                       </AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center justify-between mb-1">
-                                        <span className="font-medium">
+                                        <span className="font-medium text-foreground">
                                           {otherParty.name}
                                         </span>
                                         <Badge variant="success" className="ml-2">
                                           {transaction.status}
                                         </Badge>
                                       </div>
-                                      <div className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+                                      <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
                                         <span
                                           className={
                                             role === "buyer"
-                                              ? "text-blue-600"
-                                              : "text-green-600"
+                                              ? "text-blue-500"
+                                              : "text-green-500"
                                           }
                                         >
                                           {role === "buyer" ? "Buying" : "Selling"}
                                         </span>
                                         <span>•</span>
-                                        <span className="font-medium">
+                                        <span className="font-medium text-foreground">
                                           {transaction.item.name}
                                         </span>
                                         <span>•</span>
-                                        <span className="text-blue-600 font-semibold">
+                                        <span className="text-orange-500 font-semibold">
                                           ₹{transaction.escrowAmount.toFixed(2)}
                                         </span>
                                       </div>
                                       {transaction.latestMessage && (
-                                        <p className="text-sm text-gray-600 truncate">
+                                        <p className="text-sm text-muted-foreground truncate">
                                           {transaction.latestMessage.senderName}:{" "}
                                           {transaction.latestMessage.content}
                                         </p>
@@ -649,23 +651,23 @@ export default function ProfilePage({
         {activeTab === "reviews" && (
           <div className="space-y-4">
             {ratings.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No reviews yet</p>
+              <p className="text-center text-muted-foreground py-8">No reviews yet</p>
             ) : (
               ratings.map((rating) => (
                 <Card key={rating.id}>
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-4">
                       <Avatar>
-                        <AvatarFallback>
+                        <AvatarFallback className="bg-orange-500/20 text-orange-500">
                           {rating.fromUser.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <span className="font-medium">
+                          <span className="font-medium text-foreground">
                             {rating.fromUser.name}
                           </span>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-muted-foreground">
                             {new Date(rating.createdAt).toLocaleDateString()}
                           </span>
                         </div>
@@ -676,13 +678,13 @@ export default function ProfilePage({
                               className={`h-4 w-4 ${
                                 i < rating.stars
                                   ? "fill-yellow-400 text-yellow-400"
-                                  : "text-gray-200"
+                                  : "text-muted"
                               }`}
                             />
                           ))}
                         </div>
                         {rating.comment && (
-                          <p className="text-gray-600 text-sm">
+                          <p className="text-muted-foreground text-sm">
                             {rating.comment}
                           </p>
                         )}

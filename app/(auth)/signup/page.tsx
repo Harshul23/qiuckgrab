@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, FileUpload, SplashAnimation } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Zap, Mail, Lock, User, GraduationCap } from "lucide-react";
 
 type Step = "register" | "verify-email" | "verify-id";
@@ -147,19 +148,22 @@ export default function SignupPage() {
   // Show loading state before mounting to prevent hydration mismatch
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse text-foreground">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Zap className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold">QuickGrab</span>
+            <Zap className="h-8 w-8 text-orange-500" />
+            <span className="text-2xl font-bold text-foreground">QuickGrab</span>
           </div>
           <CardTitle>
             {step === "register" && "Create Your Account"}
@@ -174,7 +178,7 @@ export default function SignupPage() {
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4 text-sm">
+            <div className="bg-destructive/10 text-destructive p-3 rounded-md mb-4 text-sm">
               {error}
             </div>
           )}
@@ -184,7 +188,7 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="name"
                     placeholder="John Doe"
@@ -198,7 +202,7 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <Label htmlFor="email">College Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
@@ -213,7 +217,7 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <Label htmlFor="college">College/University</Label>
                 <div className="relative">
-                  <GraduationCap className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <GraduationCap className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="college"
                     placeholder="State University"
@@ -226,7 +230,7 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
@@ -239,7 +243,7 @@ export default function SignupPage() {
                   />
                 </div>
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600" disabled={loading}>
                 {loading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
@@ -258,11 +262,11 @@ export default function SignupPage() {
                   maxLength={6}
                   required
                 />
-                <p className="text-xs text-gray-500 text-center">
+                <p className="text-xs text-muted-foreground text-center">
                   Check your email for the 6-digit code
                 </p>
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600" disabled={loading}>
                 {loading ? "Verifying..." : "Verify Email"}
               </Button>
             </form>
@@ -277,7 +281,7 @@ export default function SignupPage() {
                 placeholder="Upload your student ID card photo"
                 hint="AI will verify your name, college, and expiry date"
               />
-              <Button onClick={handleVerifyId} className="w-full" disabled={loading || !idFile}>
+              <Button onClick={handleVerifyId} className="w-full bg-orange-500 hover:bg-orange-600" disabled={loading || !idFile}>
                 {loading ? "Verifying ID..." : "Verify Student ID"}
               </Button>
               <Button
@@ -290,9 +294,9 @@ export default function SignupPage() {
             </div>
           )}
 
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/signin" className="text-blue-600 hover:underline">
+            <Link href="/signin" className="text-orange-500 hover:underline">
               Sign in
             </Link>
           </div>
