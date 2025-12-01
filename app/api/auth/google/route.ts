@@ -24,6 +24,9 @@ async function verifyGoogleToken(
     );
 
     if (!response.ok) {
+      console.error(
+        `[Google Auth] Token verification failed with status: ${response.status}`
+      );
       return null;
     }
 
@@ -32,6 +35,9 @@ async function verifyGoogleToken(
     // Verify the token is for our app
     const clientId = process.env.GOOGLE_CLIENT_ID;
     if (clientId && payload.aud !== clientId) {
+      console.error(
+        `[Google Auth] Token audience mismatch: expected ${clientId}, got ${payload.aud}`
+      );
       return null;
     }
 
@@ -42,7 +48,8 @@ async function verifyGoogleToken(
       name: payload.name,
       picture: payload.picture,
     };
-  } catch {
+  } catch (error) {
+    console.error("[Google Auth] Token verification error:", error);
     return null;
   }
 }
@@ -165,7 +172,8 @@ export async function POST(request: NextRequest) {
       },
       isNewUser,
     });
-  } catch {
+  } catch (error) {
+    console.error("[Google Auth] Internal error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

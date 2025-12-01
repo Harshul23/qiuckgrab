@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useId } from "react";
 import { Button } from "@/components/ui/button";
 
 declare global {
@@ -27,6 +27,8 @@ declare global {
         };
       };
     };
+    // Track number of GoogleSignInButton instances for cleanup
+    __googleSignInButtonCount?: number;
   }
 }
 
@@ -44,6 +46,9 @@ export function GoogleSignInButton({
   disabled = false,
 }: GoogleSignInButtonProps) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  // Generate unique ID for this button instance
+  const uniqueId = useId();
+  const buttonContainerId = `google-signin-button-${uniqueId.replace(/:/g, "-")}`;
 
   const handleCredentialResponse = useCallback(
     (response: { credential: string }) => {
@@ -61,21 +66,22 @@ export function GoogleSignInButton({
       return;
     }
 
-    // Load Google Sign-In script
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
+    // Track button instances for cleanup
+    window.__googleSignInButtonCount = (window.__googleSignInButtonCount || 0) + 1;
+
+    // Check if script already exists
+    const existingScript = document.querySelector(
+      'script[src="https://accounts.google.com/gsi/client"]'
+    );
+
+    const initializeButton = () => {
       if (window.google) {
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: handleCredentialResponse,
         });
 
-        const buttonContainer = document.getElementById(
-          "google-signin-button-container"
-        );
+        const buttonContainer = document.getElementById(buttonContainerId);
         if (buttonContainer) {
           window.google.accounts.id.renderButton(buttonContainer, {
             theme: "outline",
@@ -86,18 +92,39 @@ export function GoogleSignInButton({
         }
       }
     };
-    document.head.appendChild(script);
+
+    if (existingScript) {
+      // Script already loaded, just initialize
+      if (window.google) {
+        initializeButton();
+      } else {
+        // Script is loading, wait for it
+        existingScript.addEventListener("load", initializeButton);
+      }
+    } else {
+      // Load Google Sign-In script
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = true;
+      script.onload = initializeButton;
+      document.head.appendChild(script);
+    }
 
     return () => {
-      // Cleanup script when component unmounts
-      const existingScript = document.querySelector(
-        'script[src="https://accounts.google.com/gsi/client"]'
-      );
-      if (existingScript) {
-        existingScript.remove();
+      // Decrement counter and only cleanup if no more instances
+      window.__googleSignInButtonCount = (window.__googleSignInButtonCount || 1) - 1;
+      
+      if (window.__googleSignInButtonCount === 0) {
+        const scriptToRemove = document.querySelector(
+          'script[src="https://accounts.google.com/gsi/client"]'
+        );
+        if (scriptToRemove) {
+          scriptToRemove.remove();
+        }
       }
     };
-  }, [clientId, handleCredentialResponse, text]);
+  }, [clientId, handleCredentialResponse, text, buttonContainerId]);
 
   // If no client ID, don't show the button
   if (!clientId) {
@@ -132,7 +159,7 @@ export function GoogleSignInButton({
 
   return (
     <div
-      id="google-signin-button-container"
+      id={buttonContainerId}
       className="w-full flex justify-center"
     />
   );
