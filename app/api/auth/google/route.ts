@@ -98,38 +98,85 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user exists by Google ID or email
-    let user = await prisma.user.findFirst({
-      where: {
-        OR: [{ googleId: payload.sub }, { email: payload.email }],
-      },
-    });
+    let user;
+    try {
+      user = await prisma.user.findFirst({
+        where: {
+          OR: [{ googleId: payload.sub }, { email: payload.email }],
+        },
+      });
+    } catch (findError) {
+      console.error("[Google Auth] Error finding user:", findError);
+      // If googleId field doesn't exist in DB, try finding by email only
+      user = await prisma.user.findUnique({
+        where: { email: payload.email },
+      });
+    }
 
     let isNewUser = false;
 
     if (!user) {
       // Create new user with Google auth
       isNewUser = true;
-      user = await prisma.user.create({
-        data: {
-          name: payload.name,
-          email: payload.email,
-          password: "", // No password for Google auth users
-          googleId: payload.sub,
-          photo: payload.picture || null,
-          emailVerified: true, // Google email is already verified
-          verificationStatus: "UNVERIFIED",
-        },
-      });
+      try {
+        user = await prisma.user.create({
+          data: {
+            name: payload.name,
+            email: payload.email,
+            password: "", // No password for Google auth users
+            googleId: payload.sub,
+            photo: payload.picture || null,
+            emailVerified: true, // Google email is already verified
+            verificationStatus: "UNVERIFIED",
+          },
+        });
+      } catch (createError: unknown) {
+        console.error("[Google Auth] Error creating user:", createError);
+        // Check if this is a schema error (googleId field doesn't exist)
+        const errorMessage = createError instanceof Error ? createError.message : String(createError);
+        if (errorMessage.includes("googleId") || errorMessage.includes("Unknown argument")) {
+          // Try creating without googleId if the field doesn't exist in DB
+          user = await prisma.user.create({
+            data: {
+              name: payload.name,
+              email: payload.email,
+              password: "", // No password for Google auth users
+              photo: payload.picture || null,
+              emailVerified: true,
+              verificationStatus: "UNVERIFIED",
+            },
+          });
+        } else {
+          throw createError;
+        }
+      }
     } else if (!user.googleId) {
       // Link Google account to existing user
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          googleId: payload.sub,
-          photo: user.photo || payload.picture || null,
-          emailVerified: true,
-        },
-      });
+      try {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            googleId: payload.sub,
+            photo: user.photo || payload.picture || null,
+            emailVerified: true,
+          },
+        });
+      } catch (updateError: unknown) {
+        console.error("[Google Auth] Error linking Google account:", updateError);
+        // If googleId field doesn't exist, just update email verification
+        const errorMessage = updateError instanceof Error ? updateError.message : String(updateError);
+        if (errorMessage.includes("googleId") || errorMessage.includes("Unknown argument")) {
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              photo: user.photo || payload.picture || null,
+              emailVerified: true,
+            },
+          });
+        } else {
+          throw updateError;
+        }
+      }
     }
 
     // Generate JWT token

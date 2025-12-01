@@ -210,9 +210,19 @@ ANTHROPIC_API_KEY=""
 NEXT_PUBLIC_SOCKET_URL="http://localhost:3001"
 ```
 
-### Step 3: Restart Your Development Server
+### Step 3: Update Database Schema
 
-After updating environment variables, restart your Next.js development server:
+After adding Google Sign-In support, you need to update your database schema to include the `googleId` field:
+
+```bash
+npx prisma db push
+```
+
+This will add the `googleId` column to your User table without losing existing data.
+
+### Step 4: Restart Your Development Server
+
+After updating environment variables and database, restart your Next.js development server:
 
 ```bash
 npm run dev
