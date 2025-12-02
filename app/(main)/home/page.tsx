@@ -109,13 +109,9 @@ export default function HomePage() {
   }, []);
 
   const handleLogout = () => {
-    // Clear user session data from localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setCurrentUser(null);
-    // Redirect to home page after logout
-    router.replace("/home");
+    logout(); // uses your useAuth() logout
   };
+  
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
