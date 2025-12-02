@@ -110,11 +110,7 @@ export default function HomePage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleLogout = () => {
-    // logout() handles the redirect
-    logout();
-  };
+  
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();

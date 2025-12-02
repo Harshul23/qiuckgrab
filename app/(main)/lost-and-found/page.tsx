@@ -107,11 +107,6 @@ export default function LostAndFoundPage() {
     fetchPosts(1, false);
   }, [fetchPosts]);
 
-  const handleLogout = () => {
-    // logout() handles the redirect
-    logout();
-  };
-
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     // Search is handled client-side by filtering posts, server-side search can be added later
