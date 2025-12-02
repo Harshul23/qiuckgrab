@@ -20,6 +20,55 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Progressive Web App (PWA)
+
+QuickGrab is a fully-featured PWA that can be installed on any device:
+
+### PWA Features
+- **Offline Support**: Service worker caches essential resources for offline access
+- **Installable**: Can be installed on desktop and mobile devices
+- **App-like Experience**: Runs in standalone mode without browser UI
+
+### PWA Files
+- `public/manifest.json` - Web app manifest with app metadata
+- `public/service-worker.js` - Service worker for caching and offline support
+- `public/icons/` - App icons (192x192 and 512x512)
+
+## Building Android App
+
+QuickGrab can be packaged as a native Android app using Bubblewrap (Trusted Web Activity).
+
+### Quick Start
+
+1. Install Bubblewrap CLI:
+   ```bash
+   npm install -g @bubblewrap/cli
+   ```
+
+2. Deploy your PWA to a production domain with HTTPS
+
+3. Update `bubblewrap-config.json` with your production domain
+
+4. Initialize and build:
+   ```bash
+   bubblewrap init --manifest=https://YOUR_DOMAIN/manifest.json
+   bubblewrap build
+   ```
+
+### Output Files
+- **APK**: `app-release-signed.apk` - For sideloading or alternative stores
+- **AAB**: `app-release-bundle.aab` - For Google Play Store submission
+
+### Digital Asset Links
+
+For Trusted Web Activity verification, configure `.well-known/assetlinks.json` with your signing key fingerprint:
+
+```bash
+keytool -list -v -keystore android.keystore -alias quickgrab
+```
+
+For detailed instructions, see [Android Build Guide](./docs/ANDROID_BUILD.md).
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
