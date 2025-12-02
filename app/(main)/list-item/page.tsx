@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Textarea, FileUpload } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ArrowLeft, Zap, IndianRupee, Tag, CheckCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -142,19 +143,19 @@ export default function ListItemPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
+      <header className="bg-card border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link href="/home" className="flex items-center text-gray-600 hover:text-gray-900">
+          <Link href="/home" className="flex items-center text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back
           </Link>
           <div className="flex-1 flex items-center justify-center">
             <Zap className="h-6 w-6 text-orange-500 mr-2" />
-            <span className="font-bold">QuickGrab</span>
+            <span className="font-bold text-foreground">QuickGrab</span>
           </div>
-          <div className="w-20"></div>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -165,13 +166,13 @@ export default function ListItemPage() {
           </CardHeader>
           <CardContent>
             {success && !error && (
-              <div className="bg-green-50 text-green-600 p-3 rounded-md mb-6 text-sm flex items-center">
+              <div className="bg-green-500/10 text-green-500 p-3 rounded-md mb-6 text-sm flex items-center">
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Item listed successfully! Redirecting...
               </div>
             )}
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md mb-6 text-sm">
+              <div className="bg-destructive/10 text-destructive p-3 rounded-md mb-6 text-sm">
                 {error}
               </div>
             )}
@@ -181,7 +182,7 @@ export default function ListItemPage() {
               <div className="space-y-2">
                 <Label htmlFor="name">Item Name *</Label>
                 <div className="relative">
-                  <Tag className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Tag className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="name"
                     placeholder="e.g., iPhone 13 Charger, TI-84 Calculator"
@@ -198,7 +199,7 @@ export default function ListItemPage() {
                 <Label htmlFor="category">Category *</Label>
                 <select
                   id="category"
-                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground text-sm"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   required
@@ -216,7 +217,7 @@ export default function ListItemPage() {
               <div className="space-y-2">
                 <Label htmlFor="price">Price (₹) *</Label>
                 <div className="relative">
-                  <IndianRupee className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <IndianRupee className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="price"
                     type="number"
@@ -229,7 +230,7 @@ export default function ListItemPage() {
                     required
                   />
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   AI will analyze your price against campus averages
                 </p>
               </div>
@@ -245,7 +246,7 @@ export default function ListItemPage() {
                       className={`p-2 text-sm rounded-md border transition-colors ${
                         formData.condition === cond.value
                           ? "bg-orange-500 text-white border-orange-500"
-                          : "bg-white hover:bg-gray-50 border-gray-200"
+                          : "bg-card hover:bg-accent border-border text-foreground"
                       }`}
                       onClick={() => setFormData({ ...formData, condition: cond.value })}
                     >
@@ -281,7 +282,7 @@ export default function ListItemPage() {
 
               {/* Submit */}
               <div className="pt-4">
-                <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                <Button type="submit" size="lg" className="w-full bg-orange-500 hover:bg-orange-600" disabled={loading}>
                   {loading ? "Listing Item..." : "List Item for Sale"}
                 </Button>
               </div>

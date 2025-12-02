@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Textarea, FileUpload } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ArrowLeft, Zap, Tag, MapPin, Calendar, CheckCircle, Phone } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -106,8 +107,8 @@ export default function ReportItemPage() {
   // Show loading while checking authentication
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -115,11 +116,11 @@ export default function ReportItemPage() {
   // Show sign-in prompt if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         {/* Header */}
-        <header className="bg-white border-b sticky top-0 z-50">
+        <header className="bg-card border-b sticky top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center">
-            <Link href="/lost-and-found" className="flex items-center text-gray-600 hover:text-orange-600">
+            <Link href="/lost-and-found" className="flex items-center text-muted-foreground hover:text-orange-600">
               <ArrowLeft className="h-5 w-5 mr-2" />
               Back
             </Link>
@@ -128,20 +129,20 @@ export default function ReportItemPage() {
                 <div className="bg-orange-600 p-1.5 rounded-lg">
                   <Zap className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-bold text-gray-900">QuickGrab</span>
+                <span className="font-bold text-foreground">QuickGrab</span>
               </Link>
             </div>
-            <div className="w-20"></div>
+            <ThemeToggle />
           </div>
         </header>
 
         <main className="container mx-auto px-4 py-16 max-w-md text-center">
-          <div className="bg-white rounded-2xl shadow-sm border p-8">
-            <div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-card rounded-2xl shadow-sm border p-8">
+            <div className="bg-orange-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Zap className="h-8 w-8 text-orange-600" />
             </div>
-            <h1 className="text-2xl font-bold mb-2">Sign In Required</h1>
-            <p className="text-gray-600 mb-6">
+            <h1 className="text-2xl font-bold text-foreground mb-2">Sign In Required</h1>
+            <p className="text-muted-foreground mb-6">
               You need to sign in to report a lost or found item.
             </p>
             <Link href="/signin">
@@ -149,7 +150,7 @@ export default function ReportItemPage() {
                 Sign In to Continue
               </Button>
             </Link>
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="mt-4 text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link href="/signup" className="text-orange-600 hover:underline">
                 Sign up
@@ -162,11 +163,11 @@ export default function ReportItemPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
+      <header className="bg-card border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link href="/lost-and-found" className="flex items-center text-gray-600 hover:text-orange-600">
+          <Link href="/lost-and-found" className="flex items-center text-muted-foreground hover:text-orange-600">
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back
           </Link>
@@ -175,10 +176,10 @@ export default function ReportItemPage() {
               <div className="bg-orange-600 p-1.5 rounded-lg">
                 <Zap className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold text-gray-900">QuickGrab</span>
+              <span className="font-bold text-foreground">QuickGrab</span>
             </Link>
           </div>
-          <div className="w-20"></div>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -189,13 +190,13 @@ export default function ReportItemPage() {
           </CardHeader>
           <CardContent>
             {success && !error && (
-              <div className="bg-green-50 text-green-600 p-3 rounded-md mb-6 text-sm flex items-center">
+              <div className="bg-green-500/10 text-green-500 p-3 rounded-md mb-6 text-sm flex items-center">
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Post created successfully! Redirecting...
               </div>
             )}
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md mb-6 text-sm">
+              <div className="bg-destructive/10 text-destructive p-3 rounded-md mb-6 text-sm">
                 {error}
               </div>
             )}
@@ -209,27 +210,27 @@ export default function ReportItemPage() {
                     type="button"
                     className={`p-4 rounded-lg border-2 transition-colors ${
                       formData.type === "LOST"
-                        ? "border-red-500 bg-red-50"
-                        : "border-gray-200 hover:border-gray-300"
+                        ? "border-red-500 bg-red-500/10"
+                        : "border-border hover:border-muted-foreground"
                     }`}
                     onClick={() => setFormData({ ...formData, type: "LOST" })}
                   >
                     <div className="text-2xl mb-2">🔍</div>
-                    <div className="font-medium">I Lost Something</div>
-                    <div className="text-sm text-gray-500">Report an item you&apos;ve lost</div>
+                    <div className="font-medium text-foreground">I Lost Something</div>
+                    <div className="text-sm text-muted-foreground">Report an item you&apos;ve lost</div>
                   </button>
                   <button
                     type="button"
                     className={`p-4 rounded-lg border-2 transition-colors ${
                       formData.type === "FOUND"
-                        ? "border-green-500 bg-green-50"
-                        : "border-gray-200 hover:border-gray-300"
+                        ? "border-green-500 bg-green-500/10"
+                        : "border-border hover:border-muted-foreground"
                     }`}
                     onClick={() => setFormData({ ...formData, type: "FOUND" })}
                   >
                     <div className="text-2xl mb-2">✅</div>
-                    <div className="font-medium">I Found Something</div>
-                    <div className="text-sm text-gray-500">Report an item you&apos;ve found</div>
+                    <div className="font-medium text-foreground">I Found Something</div>
+                    <div className="text-sm text-muted-foreground">Report an item you&apos;ve found</div>
                   </button>
                 </div>
               </div>
@@ -238,7 +239,7 @@ export default function ReportItemPage() {
               <div className="space-y-2">
                 <Label htmlFor="title">Item Name/Title *</Label>
                 <div className="relative">
-                  <Tag className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Tag className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="title"
                     placeholder="e.g., Blue Backpack, iPhone 14, Student ID Card"
@@ -255,7 +256,7 @@ export default function ReportItemPage() {
                 <Label htmlFor="category">Category *</Label>
                 <select
                   id="category"
-                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground text-sm"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   required
@@ -275,7 +276,7 @@ export default function ReportItemPage() {
                   {formData.type === "LOST" ? "Where did you lose it?" : "Where did you find it?"}
                 </Label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="location"
                     placeholder="e.g., Library, Cafeteria, Room 301"
@@ -292,7 +293,7 @@ export default function ReportItemPage() {
                   {formData.type === "LOST" ? "When did you lose it?" : "When did you find it?"}
                 </Label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="date"
                     type="date"
@@ -319,7 +320,7 @@ export default function ReportItemPage() {
               <div className="space-y-2">
                 <Label htmlFor="contactInfo">Contact Information (optional)</Label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="contactInfo"
                     placeholder="e.g., Phone number, WhatsApp, or email"
@@ -328,7 +329,7 @@ export default function ReportItemPage() {
                     onChange={(e) => setFormData({ ...formData, contactInfo: e.target.value })}
                   />
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   This will be visible to other users
                 </p>
               </div>

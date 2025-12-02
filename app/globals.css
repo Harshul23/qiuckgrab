@@ -28,26 +28,26 @@
 }
 
 .dark {
-  --background: 0 0% 9%;
-  --foreground: 0 0% 98%;
-  --card: 0 0% 9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 0 0% 9%;
-  --popover-foreground: 0 0% 98%;
+  --background: 220 20% 10%;
+  --foreground: 0 0% 95%;
+  --card: 220 20% 13%;
+  --card-foreground: 0 0% 95%;
+  --popover: 220 20% 13%;
+  --popover-foreground: 0 0% 95%;
   --primary: 24 95% 53%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 24 10% 17%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 24 10% 17%;
-  --muted-foreground: 0 0% 65%;
-  --accent: 24 10% 17%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
+  --secondary: 220 15% 20%;
+  --secondary-foreground: 0 0% 95%;
+  --muted: 220 15% 20%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 220 15% 25%;
+  --accent-foreground: 0 0% 95%;
+  --destructive: 0 62.8% 45%;
   --destructive-foreground: 210 40% 98%;
-  --border: 24 10% 17%;
-  --input: 24 10% 17%;
+  --border: 220 15% 22%;
+  --input: 220 15% 22%;
   --ring: 24 95% 53%;
-  --success: 142 76% 36%;
+  --success: 142 76% 40%;
   --success-foreground: 210 40% 98%;
   --warning: 38 92% 50%;
   --warning-foreground: 0 0% 0%;
@@ -130,6 +130,22 @@ body {
 
 .ring-offset-background {
   --tw-ring-offset-color: hsl(var(--background));
+}
+
+.bg-popover {
+  background-color: hsl(var(--popover));
+}
+
+.text-popover-foreground {
+  color: hsl(var(--popover-foreground));
+}
+
+.border-border {
+  border-color: hsl(var(--border));
+}
+
+.bg-border {
+  background-color: hsl(var(--border));
 }
 
 /* Splash Animation Styles */
