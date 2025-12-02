@@ -4,4 +4,11 @@ const config = {
   },
 };
 
+module.exports = {
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
+}
+
+
 export default config;

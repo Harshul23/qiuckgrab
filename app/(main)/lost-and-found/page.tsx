@@ -102,6 +102,11 @@ export default function LostAndFoundPage() {
     }
   }, [activeType, activeCategory]);
 
+  const handleLogout = () => {
+    // logout() handles the redirect
+    logout();
+  };
+
   // Initial fetch on mount
   useEffect(() => {
     fetchPosts(1, false);

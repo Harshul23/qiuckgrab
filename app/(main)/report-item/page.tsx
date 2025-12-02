@@ -256,7 +256,7 @@ export default function ReportItemPage() {
                 <Label htmlFor="category">Category *</Label>
                 <select
                   id="category"
-                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground text-sm"
+                  className="w-full h-10 px-3 rounded-md bg-[#15181f] appearance-none border text-sm"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   required
