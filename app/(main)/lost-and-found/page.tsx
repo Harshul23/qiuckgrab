@@ -104,14 +104,6 @@ export default function LostAndFoundPage() {
     fetchPosts(1, false);
   }, [fetchPosts]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setCurrentUser(null);
-    // Redirect to home page after logout
-    router.replace("/home");
-  };
-
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     // Search is handled client-side by filtering posts, server-side search can be added later
