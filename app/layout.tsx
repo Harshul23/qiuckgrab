@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "QuickGrab - AI-Powered Student Marketplace",
@@ -19,6 +20,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" storageKey="quickgrab-theme">
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
